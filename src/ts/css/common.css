@@ -1,0 +1,69 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+*:focus {
+  outline: none;
+}
+
+:root {
+  --background-color: rgb(40, 44, 45);
+  --text-color: white;
+  --link-color: rgb(135, 140, 150);
+
+  --button-color: rgb(37, 136, 208);
+  --cancel-button-color: rgb(168, 81, 73);
+
+  --avatar-size: 50px;
+  --sidebar-icon-size: 30px;
+
+  --column-header-background-color: rgb(250, 250, 250);
+  --column-header-text-color: rgb(150, 150, 150);
+
+  --timeline-background-color: white;
+  --timeline-text-color: rgb(80, 80, 80);
+
+  --toot-nonenphasized-text-color: rgb(150, 150, 150);
+  --toot-background-color: rgb(240, 240, 242);
+  --toot-spoiler-button-backgrond-color: rgb(80, 80, 120);
+  --toot-spoiler-button-text-color: rgb(246, 244, 255);
+  --toot-option-bar-background-color: rgb(235, 235, 235);
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+html {
+  background-color: var(--background-color);
+  font-family: sans-serif;
+  color: var(--text-color);
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+button,
+.button {
+  display: inline-block;
+  border: none;
+  background-color: var(--button-color);
+  color: var(--text-color);
+  font-size: 1em;
+  text-decoration: none;
+  padding: 0.5em 2em;
+  margin: 0 1em;
+  cursor: pointer;
+}
+
+.cancel-button,
+.delete-button {
+  background-color: var(--cancel-button-color);
+}

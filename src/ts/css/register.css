@@ -1,0 +1,47 @@
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-page {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+}
+
+.page-title,
+.page-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-title {
+  font-size: 2em;
+  padding: 0.8em 0;
+}
+
+.page-content {
+  font-size: 1.5em;
+  padding: 2em 0;
+}
+
+.instance-url {
+  color: rgb(166, 166, 166);
+}
+
+.instance-host-input,
+.auth-code-input {
+  border: none;
+  border-bottom: 2px solid var(--button-color);
+  background-color: transparent;
+  font-size: 1em;
+  padding: 0.1em 0.5em;
+  color: white;
+}
+
+.auth-code-input {
+  width: 30em;
+  text-align: center;
+}

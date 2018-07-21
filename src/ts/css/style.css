@@ -1,0 +1,468 @@
+/* アカウントがないときの画面 */
+
+.no-account-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.no-account-container {
+  text-align: center;
+}
+
+.no-account-container h1 {
+  padding: 1em 0;
+}
+
+/* メイン画面 */
+
+.whiteflag {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* サイドバー */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 calc(var(--avatar-size) + 30px);
+}
+
+.current-user-avatar-container {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.current-user-avatar {
+  width: var(--avatar-size);
+  height: auto;
+  border-radius: 3px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(var(--sidebar-icon-size) + 30px);
+}
+
+.sidebar-item[data-selected="true"] {
+  background-color: var(--button-color);
+}
+
+.sidebar-item-icon {
+  width: var(--sidebar-icon-size);
+  height: auto;
+}
+
+/* メイン領域 */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+/* カラム */
+
+.columns-container {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--timeline-background-color);
+  color: var(--timeline-text-color);
+  min-width: 0;
+}
+
+.column:not(:last-child) {
+  border-right: 1px solid var(--column-header-text-color);
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--column-header-background-color);
+  color: var(--column-header-text-color);
+  border-bottom: 1px solid var(--column-header-text-color);
+  height: 40px;
+}
+
+.column-title {
+  font-size: 0.8em;
+  font-weight: normal;
+  user-select: none;
+}
+
+.column-status-indicator {
+  font-size: 0.8em;
+  background-color: rgb(127, 207, 128);
+  color: white;
+  padding: 0.1em 1em;
+}
+
+.column-status-indicator:empty {
+  display: none;
+}
+
+.column-status-indicator[data-status-type="error"] {
+  background-color: rgb(207, 124, 120);
+}
+
+/* トゥート欄 */
+
+.toot-input {
+  display: block;
+  border: none;
+  border-radius: 3px 3px 0 0;
+  font-size: 1em;
+  resize: none;
+  width: 100%;
+  height: 10em;
+  padding: 0.5em;
+}
+
+.toot-input-cw {
+  display: block;
+  border: none;
+  border-radius: 3px;
+  font-size: 1em;
+  width: 100%;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.toot-option-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: stretch;
+  background-color: var(--toot-option-bar-background-color);
+  border-radius: 0 0 3px 3px;
+  color: var(--timeline-text-color);
+  padding: 0.8em 1em;
+}
+
+.content-warning-button {
+  padding: 0;
+}
+
+.toot-count {
+  flex: 1;
+  text-align: right;
+}
+
+.toot-button-container {
+  padding: 0.5em 0;
+  text-align: right;
+}
+
+.toot-button {
+  margin: 0;
+}
+
+.content-warning-button {
+  background-color: transparent;
+  color: var(--timeline-text-color);
+  margin: 0 0.5em;
+}
+
+.content-warning-button[data-on="true"] {
+  color: var(--button-color);
+}
+
+/* トゥートカラム */
+
+.toot-column {
+  flex: none;
+  background-color: var(--background-color);
+  width: 300px;
+  padding: 2em 2em;
+}
+
+/* トゥートバー */
+
+.tootbar {
+  padding: 1em 2em;
+}
+
+.tootbar:not(:focus-within) .toot-input {
+  height: 2em;
+}
+
+.tootbar:not(:focus-within) .toot-option-bar {
+  display: none;
+}
+
+.tootbar:not(:focus-within) .toot-button-container {
+  display: none;
+}
+
+/* タイムライン */
+
+.timeline {
+  flex: 1;
+  overflow: auto;
+}
+
+.toot-container {
+  margin: 0.8em 0.5em;
+}
+
+.toot {
+  display: flex;
+  background-color: var(--toot-background-color);
+  border-radius: 3px;
+  width: 100%;
+}
+
+.toot-transition-enter {
+  transform: scale(0.1);
+}
+
+.toot-transition-enter.toot-transition-enter-active {
+  transform: scale(1);
+  transition: transform 200ms ease-out;
+}
+
+.toot-avatar-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 80px;
+  padding: 0.8em 0;
+}
+
+.toot-avatar {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 3px;
+}
+
+.toot-main {
+  flex: 1;
+  padding: 0.8em 1em;
+  min-width: 0;
+}
+
+.toot-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.toot-name,
+.toot-timestamp {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.toot-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toot-acct,
+.toot-timestamp {
+  color: var(--toot-nonenphasized-text-color);
+}
+
+.toot-content {
+  word-break: break-all;
+}
+
+.multibattle-button {
+  font-size: 0.8em;
+  margin: 0 0.1em;
+  padding: 0.1em 0.2em;
+}
+
+.toot-media-attachments-container {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  margin-top: 0.5em;
+}
+
+.toot-media-attachment {
+  display: block;
+  position: relative;
+  flex: 1 1 50%;
+  cursor: zoom-in;
+  padding: 0.1em;
+}
+
+.toot-media-attachment-content {
+  max-width: 100%;
+  max-height: 20em;
+  object-fit: cover;
+}
+
+.toot-media-attachment-spoiler-warning {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(60, 60, 60);
+  color: white;
+  padding: auto;
+}
+
+.toot-media-attachment-spoiler-warning > div {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+}
+
+.spoiler {
+  margin-top: 0.3em;
+}
+
+.spoiler-summary {
+  background-color: var(--toot-spoiler-button-backgrond-color);
+  color: var(--toot-spoiler-button-text-color);
+  border-radius: 3px;
+  list-style-type: none;
+  text-align: center;
+  padding: 0.3em 0;
+}
+
+.spoiler-summary::-webkit-details-marker {
+  display: none;
+}
+
+.spoiler-content {
+  word-break: break-all;
+}
+
+.emoji {
+  width: 1em;
+  height: auto;
+  vertical-align: middle;
+}
+
+.toot-action-bar {
+  display: flex;
+  margin-top: 0.5em;
+}
+
+.toot-action-button {
+  background-color: transparent;
+  background-size: 1.5em;
+  width: 1.5em;
+  height: 1.5em;
+  padding: 0.2em;
+  margin: 0 1.5em 0 0;
+  cursor: pointer;
+}
+
+.toot-action-button:hover {
+  filter: brightness(1.8);
+}
+
+.toot-action-reply {
+  background-image: url("../images/reply.svg");
+}
+
+.toot-action-boost {
+  background-image: url("../images/boost.svg");
+}
+
+.toot-action-favourite {
+  background-image: url("../images/favourite.svg");
+}
+
+/* カラム一覧 */
+
+.column-list {
+  list-style-type: none;
+  padding: 0.5em 1em;
+}
+
+.column-list-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--toot-background-color);
+  color: var(--timeline-text-color);
+  padding: 0.5em 1em;
+  margin: 0.5em 0;
+}
+
+.column-list-item-transition-enter {
+  transform: scale(0.1);
+}
+
+.column-list-item-transition-enter.column-list-item-transition-enter-active {
+  transform: scale(1);
+  transition: transform 200ms ease-out;
+}
+
+.column-list-item-transition-exit.column-list-item-transition-exit-active {
+  transform: scale(0.1);
+  transition: transform 200ms ease-in;
+}
+
+.column-list-item-title {
+  flex: 1;
+}
+
+.add-column-container {
+  text-align: center;
+}
+
+.add-column-selector {
+  font-size: 1em;
+}
+
+/* メディアダイアログ */
+
+.media-dialog[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.media-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.media-dialog-content {
+  max-width: 100vmin;
+  max-height: 100vmin;
+}
+
+.media-dialog-content img,
+.media-dialog-content video {
+  max-width: 100vmin;
+  max-height: 100vmin;
+  object-fit: contain;
+  cursor: zoom-out;
+}

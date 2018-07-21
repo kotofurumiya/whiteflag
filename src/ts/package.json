@@ -1,0 +1,8 @@
+{
+  "name": "whiteflag",
+  "productName": "Whiteflag",
+  "description": "A mastodon client for mimumedon.com",
+  "version": "0.0.1",
+  "author": "Koto Furumiya <kotofurumiya@gmail.com> (https://sbfl.net/)",
+  "main": "main.min.js"
+}
