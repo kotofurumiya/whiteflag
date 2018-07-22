@@ -15,9 +15,11 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
 
   protected _tootInputRef: React.RefObject<HTMLTextAreaElement>;
   protected _spoilerInputRef: React.RefObject<HTMLInputElement>;
+  protected _tootButtonRef: React.RefObject<HTMLButtonElement>;
 
   protected _toggleContentWarningListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
   protected _onInputListener: (evt: React.KeyboardEvent<any>) => void;
+  protected _onKeyDownListener: (evt: React.KeyboardEvent<HTMLElement>) => void;
   protected _postTootListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
 
   constructor(props:TootInputProps) {
@@ -27,10 +29,12 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
 
     this._tootInputRef = React.createRef();
     this._spoilerInputRef = React.createRef();
+    this._tootButtonRef = React.createRef();
 
     this._toggleContentWarningListener = this._toggleContentWarning.bind(this);
     this._postTootListener = this._postToot.bind(this);
     this._onInputListener = this._onInput.bind(this);
+    this._onKeyDownListener = this._onKeyDown.bind(this);
 
     this.state = {
       remainLength: this._maxLength,
@@ -60,13 +64,23 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     this.setState({ remainLength });
   }
 
-  protected _postToot(evt: React.MouseEvent<HTMLButtonElement>) {
-    const button = evt.target as HTMLButtonElement;
+  protected _onKeyDown(evt: React.KeyboardEvent<HTMLElement>) {
+    if(evt.ctrlKey && evt.key === 'Enter') {
+      evt.preventDefault();
+      this._postToot();
+    }
+  }
+
+  protected _postToot() {
+    const button = this._tootButtonRef.current;
     const textArea = this._tootInputRef.current;
     const spoiler = this._spoilerInputRef.current;
 
     if(textArea && textArea.value && this.state.remainLength >= 0) {
-      button.disabled = true;
+      if(button) {
+        button.disabled = true;
+      }
+
       const toot = { status: textArea.value };
 
       if(spoiler && this.state.enableContentWarning) {
@@ -88,9 +102,13 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           spoilerAfter.dispatchEvent(new Event('input'));
         }
 
-        button.disabled = false;
+        if(button) {
+          button.disabled = false;
+        }
       }).catch((e) => {
-        button.disabled = false;
+        if(button) {
+          button.disabled = false;
+        }
       });
     }
   }
@@ -102,12 +120,14 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           className="toot-input-cw"
           placeholder="ここに警告を書いてください"
           onInput={this._onInputListener}
+          onKeyDown={this._onKeyDownListener}
           ref={this._spoilerInputRef}
         /> : undefined}
         <textarea
           className="toot-input"
           placeholder="今なにしてる？"
           onInput={this._onInputListener}
+          onKeyDown={this._onKeyDownListener}
           ref={this._tootInputRef}
           required
         />
@@ -124,7 +144,13 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
         </div>
 
         <div className="toot-button-container">
-          <button className="toot-button" onClick={this._postTootListener}>トゥート！</button>
+          <button
+            className="toot-button"
+            onClick={this._postTootListener}
+            ref={this._tootButtonRef}
+          >
+            トゥート！
+          </button>
         </div>
       </div>
     )
