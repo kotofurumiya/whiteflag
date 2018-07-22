@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500px" height="500px" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.1 (57501) - http://www.bohemiancoding.com/sketch -->
+    <title>preferences</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="preferences" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" stroke="#FFFFFF" stroke-width="70" fill-rule="nonzero" cx="250.5" cy="250.5" r="126.5"></circle>
+        <path d="M224.6276,36 L276.3724,36 L305,112.286756 L196,112.286756 L224.6276,36 Z M383.879855,80.5310463 L420.468954,117.120145 L386.768842,191.305797 L309.694203,114.231158 L383.879855,80.5310463 Z M465,224.6276 L465,276.3724 L388.713244,305 L388.713244,196 L465,224.6276 Z M420.468954,383.879855 L383.879855,420.468954 L309.694203,386.768842 L386.768842,309.694203 L420.468954,383.879855 Z M276.3724,465 L224.6276,465 L196,388.713244 L305,388.713244 L276.3724,465 Z M117.120145,420.468954 L80.5310463,383.879855 L114.231158,309.694203 L191.305797,386.768842 L117.120145,420.468954 Z M36,276.3724 L36,224.6276 L112.286756,196 L112.286756,305 L36,276.3724 Z M80.5310463,117.120145 L117.120145,80.5310463 L191.305797,114.231158 L114.231158,191.305797 L80.5310463,117.120145 Z" id="Rectangle-3" fill="#FFFFFF" fill-rule="nonzero"></path>
+    </g>
+</svg>

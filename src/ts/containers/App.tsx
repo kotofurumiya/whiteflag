@@ -20,7 +20,8 @@ import {
   changeConnectionState,
   changeMainColumn,
   connectColumnToStream, removeColumn,
-  updateCurrentDate
+  updateCurrentDate,
+  changeTheme
 } from '../actions/whiteflag';
 
 interface AppProps {
@@ -31,6 +32,7 @@ interface AppProps {
   readonly accountInfoList: AccountInfo[];
   readonly currentAccount: MastodonAccount;
   readonly tootMode: WhiteflagTootMode;
+  readonly themeName: string;
   readonly changeMainColumnType: (type: WhiteflagColumnType, query: any) => any;
   readonly dispatch: Redux.Dispatch;
 }
@@ -52,6 +54,7 @@ class _App extends React.Component<AppProps> {
   protected _addColumnBound: (type: WhiteflagColumnType, query: any) => any;
   protected _removeColumnBound: (columnId: string) => any;
   protected _postTootBound: (toot: MastodonTootPost) => Promise<any>;
+  protected _changeThemeBound: (themeName: string) => any;
 
   constructor(props: AppProps) {
     super(props);
@@ -67,6 +70,7 @@ class _App extends React.Component<AppProps> {
     this._addColumnBound = this._addColumn.bind(this);
     this._removeColumnBound = this._removeColumn.bind(this);
     this._postTootBound = this._postToot.bind(this);
+    this._changeThemeBound = this._changeTheme.bind(this);
 
     setInterval(() => {
       this.props.dispatch(updateCurrentDate(new Date()));
@@ -126,11 +130,19 @@ class _App extends React.Component<AppProps> {
 
     return Promise.reject('whiteflagが初期化されていません。');
   }
+  
+  protected _changeTheme(themeName: string) {
+    const themePath = `css/theme/${themeName}.css`;
+    const linkElement = document.querySelector('#theme-css') as HTMLLinkElement;
+    linkElement.href = themePath;
+
+    this.props.dispatch(changeTheme(themeName));
+  }
 
   // componentDidUpdateでdispatchすると再帰的にcomponentDidUpdateが走り、条件によっては無限ループになるので注意。
   // static getDerivedStateFromPropsに処理を移すべきかもしれない。
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-    if(this.props.accountInfoList.length > 0) {
+    if(this._whiteflag && this.props.accountInfoList.length > 0) {
 
       for(const column of [this.props.mainColumn, this.props.notificationColumn, ...this.props.columnList]) {
         const isNotWhiteflagColumn = !column.columnType.startsWith('whiteflag:');
@@ -144,7 +156,7 @@ class _App extends React.Component<AppProps> {
         if (isNotWhiteflagColumn && supportsStreaming && needsConnect) {
           this.props.dispatch(changeConnectionState(column.columnId, null, 'connecting'));
           const streamType = convertColumnTypeToStreamType(column.columnType);
-          this.props.dispatch(connectColumnToStream(this._whiteflag!, column.columnId, streamType, column.stream.query));
+          this.props.dispatch(connectColumnToStream(this._whiteflag, column.columnId, streamType, column.stream.query));
         }
 
         // ストリームに接続済みの場合、メッセージを受信したときに
@@ -189,7 +201,7 @@ class _App extends React.Component<AppProps> {
       const columns = [this.props.mainColumn, ...this.props.columnList].map((cData) => {
         let onInit;
 
-        if (cData.columnType === WhiteflagColumnType.WHITEFLAG_TOOT || cData.columnType === WhiteflagColumnType.WHITEFLAG_COLUMN) {
+        if (cData.columnType.startsWith('whiteflag:')) {
           onInit = () => {};
         } else {
           const timelineType = convertColumnTypeToTimelineType(cData.columnType);
@@ -205,11 +217,13 @@ class _App extends React.Component<AppProps> {
             query={cData.query}
             tootList={cData.tootList}
             currentDate={this.props.currentDate}
+            themeName={this.props.themeName}
             status={cData.stream.state}
             showMedia={this._showMediaBound}
             addColumn={this._addColumnBound}
             removeColumn={this._removeColumnBound}
             postToot={this._postTootBound}
+            changeTheme={this._changeThemeBound}
             columnList={this.props.columnList}
             onInit={onInit}
           />
@@ -256,6 +270,7 @@ function mapStateToProps(state: AppState): object {
     notificationColumn: state.whiteflagData.notificationColumn,
     columnList: state.whiteflagData.columnList,
     currentDate: state.whiteflagData.currentDate,
+    themeName: state.whiteflagData.themeName,
     accountInfoList: state.accountData.accountInfoList,
     currentAccount: state.accountData.currentAccount,
     tootMode: state.whiteflagData.tootMode

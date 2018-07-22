@@ -7,6 +7,7 @@ import {MastodonStreamType, MastodonTimelineType, MastodonTootPost} from './stum
 export enum WhiteflagColumnType {
   WHITEFLAG_TOOT = 'whiteflag:toot',
   WHITEFLAG_COLUMN = 'whiteflag:column',
+  WHITEFLAG_PREFERENCES = 'whiteflag:preferences',
   HOME = 'home',
   PUBLIC = 'public',
   PUBLIC_LOCAL = 'public:local',
@@ -173,6 +174,9 @@ export function convertColumnTypeToTitle(columnType: WhiteflagColumnType, query:
 
     case WhiteflagColumnType.WHITEFLAG_COLUMN:
       return 'Columns';
+
+    case WhiteflagColumnType.WHITEFLAG_PREFERENCES:
+      return 'Preferences';
 
     case WhiteflagColumnType.HOME:
       return 'Home';

@@ -5,6 +5,7 @@ import { Toot } from './Toot';
 import { MastodonTootStatus, MastodonTootPost } from '../lib/stump';
 import { WhiteflagColumn, WhiteflagColumnType } from '../lib/whiteflag';
 import {TootInput} from "./TootInput";
+import { ChangeEvent } from 'react';
 
 interface ColumnProps {
   title: string;
@@ -13,11 +14,13 @@ interface ColumnProps {
   query: object;
   tootList: MastodonTootStatus[];
   currentDate: Date;
-  status: string,
-  showMedia: (url: string, type: string) => any,
+  themeName: string;
+  status: string;
+  showMedia: (url: string, type: string) => any;
   addColumn: (type: WhiteflagColumnType, query: any) => any;
   removeColumn: (id: string) => any;
   postToot: (toot: MastodonTootPost) => Promise<any>;
+  changeTheme: (themeName: string) => any;
   columnList?: WhiteflagColumn[];
   onInit?: () => void;
 }
@@ -31,6 +34,7 @@ export class Column extends React.Component<ColumnProps> {
 
   protected _addColumnListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
   protected _removeColumnListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  protected _changeThemeListener: (evt: ChangeEvent<HTMLSelectElement>) => void;
 
   constructor(props: ColumnProps) {
     super(props);
@@ -47,6 +51,7 @@ export class Column extends React.Component<ColumnProps> {
 
     this._addColumnListener = this._addColumn.bind(this);
     this._removeColumnListener = this._removeColumn.bind(this);
+    this._changeThemeListener = this._changeTheme.bind(this);
   }
 
   protected _addColumn(evt: Event) {
@@ -71,6 +76,14 @@ export class Column extends React.Component<ColumnProps> {
     if(removeId) {
       this.props.removeColumn(removeId);
     }
+  }
+
+  protected _changeTheme(evt: ChangeEvent<HTMLSelectElement>) {
+    this.props.changeTheme(evt.target.value);
+  }
+
+  protected _addAccount() {
+    location.href = 'register.html';
   }
 
   render() {
@@ -152,8 +165,34 @@ export class Column extends React.Component<ColumnProps> {
       );
     }
 
+    if(this.props.columnType === WhiteflagColumnType.WHITEFLAG_PREFERENCES) {
+      return (
+        <div className="column">
+          <header className="column-header">
+            <h1 className="column-title">設定</h1>
+          </header>
+          <div className="column-main">
+            <div className="preferences-container">
+              <div className="preference-item">
+                <h2 className="preference-name">テーマ</h2>
+                <select value={this.props.themeName} onChange={this._changeThemeListener}>
+                  <option value="whiteflag">whiteflag</option>
+                  <option value="blackflag">blackflag</option>
+                </select>
+              </div>
+
+              <div className="preference-item">
+                <h2 className="preference-name">アカウント</h2>
+                <button className="button" onClick={this._addAccount}>アカウントを追加</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     const supportStreaming = this.props.columnType !== WhiteflagColumnType.ACCOUNT &&
-                             this.props.columnType !== WhiteflagColumnType.CURRENT_ACCOUNT
+                             this.props.columnType !== WhiteflagColumnType.CURRENT_ACCOUNT;
     const isConnecting = this.props.status === 'uninitialized' ||
                          this.props.status === 'connecting' ||
                          this.props.status === 'disconnected';

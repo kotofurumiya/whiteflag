@@ -2,7 +2,7 @@ import { Action } from 'redux';
 import { Whiteflag, WhiteflagColumnType } from '../lib/whiteflag';
 import { MastodonStreamType } from '../lib/stump/mastodon';
 
-export interface WhiteflagUpdateCurrentDateAction extends  Action {
+export interface WhiteflagUpdateCurrentDateAction extends Action {
   readonly type: string;
   readonly payload: {
     readonly currentDate: Date;
@@ -50,6 +50,13 @@ export interface WhiteflagStreamChangeConnectionStateAction extends Action {
     readonly columnId: string;
     readonly webSocket: WebSocket | null;
     readonly state: string;
+  }
+}
+
+export interface WhiteflagChangeThemeAction extends Action {
+  readonly type: string;
+  readonly payload: {
+    readonly themeName: string;
   }
 }
 
@@ -115,4 +122,13 @@ export function changeConnectionState(columnId: string, webSocket: WebSocket | n
       state
     }
   };
+}
+
+export function changeTheme(themeName: string): WhiteflagChangeThemeAction {
+  return {
+    type: 'WHITEFLAG_CHANGE_THEME',
+    payload: {
+      themeName
+    }
+  }
 }

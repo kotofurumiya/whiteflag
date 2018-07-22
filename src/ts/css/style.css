@@ -90,7 +90,7 @@
 }
 
 .column:not(:last-child) {
-  border-right: 1px solid var(--column-header-text-color);
+  border-right: 1px solid var(--column-border-color);
 }
 
 .column-header {
@@ -99,7 +99,7 @@
   justify-content: center;
   background-color: var(--column-header-background-color);
   color: var(--column-header-text-color);
-  border-bottom: 1px solid var(--column-header-text-color);
+  border-bottom: 1px solid var(--column-border-color);
   height: 40px;
 }
 
@@ -433,6 +433,19 @@
 
 .add-column-selector {
   font-size: 1em;
+}
+
+/* 設定カラム */
+
+.preference-item {
+  padding: 0.5em 1em;
+  margin-bottom: 1.5em;
+}
+
+.preference-name {
+  font-size: 1.5em;
+  font-weight: normal;
+  margin-bottom: 0.5em;
 }
 
 /* メディアダイアログ */

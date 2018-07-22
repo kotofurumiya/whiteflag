@@ -15,7 +15,7 @@ import {
   WhiteflagTootMode
 } from '../lib/whiteflag';
 import {
-  WhiteflagChangeMainColumnAction,
+  WhiteflagChangeMainColumnAction, WhiteflagChangeThemeAction,
   WhiteflagColumnAction, WhiteflagColumnAddAction,
   WhiteflagStreamChangeConnectionStateAction, WhiteflagUpdateCurrentDateAction
 } from '../actions/whiteflag';
@@ -28,6 +28,7 @@ export interface WhiteflagState {
   readonly columnList: WhiteflagColumn[];
   readonly tootMode: WhiteflagTootMode;
   readonly currentDate: Date;
+  readonly themeName: string;
 }
 
 export interface MastodonAccountState {
@@ -64,7 +65,8 @@ const initialWhiteflagState: WhiteflagState = {
   },
   columnList: [],
   tootMode: WhiteflagTootMode.COLUMN,
-  currentDate: new Date()
+  currentDate: new Date(),
+  themeName: 'whiteflag'
 };
 
 const initialAccountState: MastodonAccountState = {
@@ -106,6 +108,7 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
   const mainColumn: WhiteflagColumn = cloneColumn(state.mainColumn);
   const notificationColumn: WhiteflagColumn = cloneColumn(state.notificationColumn);
   const columnList: WhiteflagColumn[] = state.columnList.map((c) => cloneColumn(c));
+  const themeName = state.themeName;
 
   switch(action.type) {
     // 時刻がアップデートされたとき。
@@ -115,7 +118,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn,
         columnList,
         tootMode: state.tootMode,
-        currentDate: (action as WhiteflagUpdateCurrentDateAction).payload.currentDate
+        currentDate: (action as WhiteflagUpdateCurrentDateAction).payload.currentDate,
+        themeName
       }
     }
 
@@ -149,7 +153,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn,
         columnList,
         tootMode,
-        currentDate: state.currentDate
+        currentDate: state.currentDate,
+        themeName
       };
     }
 
@@ -177,7 +182,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn,
         columnList,
         tootMode,
-        currentDate: state.currentDate
+        currentDate: state.currentDate,
+        themeName
       };
     }
 
@@ -235,7 +241,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn: newNotificationColumn,
         columnList,
         tootMode,
-        currentDate: state.currentDate
+        currentDate: state.currentDate,
+        themeName
       };
     }
 
@@ -276,7 +283,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn,
         columnList: state.columnList,
         tootMode,
-        currentDate: state.currentDate
+        currentDate: state.currentDate,
+        themeName
       };
     }
 
@@ -318,7 +326,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         notificationColumn,
         columnList,
         tootMode,
-        currentDate: state.currentDate
+        currentDate: state.currentDate,
+        themeName
       };
     }
 
@@ -365,7 +374,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
             notificationColumn,
             columnList,
             tootMode,
-            currentDate: state.currentDate
+            currentDate: state.currentDate,
+            themeName
           };
         }
 
@@ -405,7 +415,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
             notificationColumn,
             columnList,
             tootMode,
-            currentDate: state.currentDate
+            currentDate: state.currentDate,
+            themeName
           };
         }
 
@@ -413,6 +424,17 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         default:
           return state;
       }
+    }
+
+    case 'WHITEFLAG_CHANGE_THEME': {
+      return {
+        mainColumn,
+        notificationColumn,
+        columnList,
+        tootMode: state.tootMode,
+        currentDate: state.currentDate,
+        themeName: (action as WhiteflagChangeThemeAction).payload.themeName
+      };
     }
 
     // それ以外のときはstateをそのまま返す。

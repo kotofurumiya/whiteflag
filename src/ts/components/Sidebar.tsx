@@ -91,6 +91,14 @@ export class Sidebar extends React.Component<SidebarProps> {
         >
           <img className="sidebar-item-icon" src="images/column.svg"/>
         </div>
+
+        <div
+          className="sidebar-item"
+          onClick={() => this.props.changeMainColumnType(WhiteflagColumnType.WHITEFLAG_PREFERENCES)}
+          data-selected={this.props.selectedColumnType === WhiteflagColumnType.WHITEFLAG_PREFERENCES}
+        >
+          <img className="sidebar-item-icon" src="images/preferences.svg"/>
+        </div>
       </nav>
     );
   }
