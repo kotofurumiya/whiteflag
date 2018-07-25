@@ -477,6 +477,10 @@
   margin-bottom: 0.5em;
 }
 
+.preference-account {
+  display: none;
+}
+
 /* メディアダイアログ */
 
 .media-dialog[open] {

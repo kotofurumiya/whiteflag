@@ -192,7 +192,7 @@ export class Column extends React.Component<ColumnProps> {
                 </select>
               </div>
 
-              <div className="preference-item">
+              <div className="preference-item preference-account">
                 <h2 className="preference-name">アカウント</h2>
                 <button className="button" onClick={this._addAccount}>アカウントを追加</button>
               </div>
