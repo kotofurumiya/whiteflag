@@ -199,7 +199,8 @@
 
 .toot-input-attachment-media {
   display: block;
-  max-width: 100%;
+  width: 100%;
+  height: 5em;
   object-fit: cover;
 }
 
