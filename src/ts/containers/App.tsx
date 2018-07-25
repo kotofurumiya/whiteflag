@@ -107,6 +107,12 @@ class _App extends React.Component<AppProps> {
       this.props.dispatch(updateAccountInfoList(accountList));
       this.props.dispatch(fetchAccount(whiteflag));
       this._loadColumns();
+
+      const theme = localStorage.getItem('theme');
+      if(theme) {
+        this._changeTheme(theme);
+      }
+
       window.onbeforeunload = () => this._saveColumns();
     }
   }
@@ -250,6 +256,7 @@ class _App extends React.Component<AppProps> {
     linkElement.href = themePath;
 
     this.props.dispatch(changeTheme(themeName));
+    localStorage.setItem('theme', themeName);
   }
 
   // componentDidUpdateでdispatchすると再帰的にcomponentDidUpdateが走り、条件によっては無限ループになるので注意。
