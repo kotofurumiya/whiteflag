@@ -153,7 +153,7 @@
   justify-content: stretch;
   background-color: var(--toot-option-bar-background-color);
   border-radius: 0 0 3px 3px;
-  color: var(--timeline-text-color);
+  color: var(--toot-option-bar-text-color);
   padding: 0.8em 1em;
 }
 
@@ -177,7 +177,7 @@
 
 .content-warning-button {
   background-color: transparent;
-  color: var(--timeline-text-color);
+  color: var(--toot-option-bar-text-color);
   margin: 0 0.5em;
 }
 
