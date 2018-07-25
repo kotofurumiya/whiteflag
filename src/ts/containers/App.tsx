@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import {
   AccountInfo,
-  AccountStorage,
+  AccountStorage, LocalStorage,
   MastodonAccount, MastodonAttachment,
   MastodonTootPost, MastodonTootPostParams,
   MastodonTootStatus,
@@ -53,6 +53,7 @@ interface AppState {
 
 class _App extends React.Component<AppProps> {
   protected _accountStorage: AccountStorage;
+  protected _locsalStorage: LocalStorage;
   protected _whiteflag: Whiteflag | null;
   protected _nextColumnId: number;
 
@@ -77,6 +78,9 @@ class _App extends React.Component<AppProps> {
     super(props);
     this._accountStorage = new AccountStorage();
     const accountList = this._accountStorage.getAccountList();
+
+    this._locsalStorage = new LocalStorage();
+
     this._whiteflag = null;
     this._nextColumnId = 0;
 
@@ -108,9 +112,8 @@ class _App extends React.Component<AppProps> {
       this.props.dispatch(fetchAccount(whiteflag));
       this._loadColumns();
 
-      const theme = localStorage.getItem('theme');
-      if(theme) {
-        this._changeTheme(theme);
+      if(this._locsalStorage.has('theme')) {
+        this._changeTheme(this._locsalStorage.getString('theme'));
       }
 
       window.onbeforeunload = () => this._saveColumns();
@@ -147,7 +150,7 @@ class _App extends React.Component<AppProps> {
     columnData['mainColumn'] = { type: mainColumn.columnType, query: mainColumn.query };
     columnData['subColumns'] = this.props.columnList.map((col) => ({type: col.columnType, query: col.query}));
 
-    localStorage.setItem('columns', JSON.stringify(columnData));
+    this._locsalStorage.setJson('columns', columnData);
   }
 
   protected _showMedia(url: string, type: string) {
@@ -256,7 +259,7 @@ class _App extends React.Component<AppProps> {
     linkElement.href = themePath;
 
     this.props.dispatch(changeTheme(themeName));
-    localStorage.setItem('theme', themeName);
+    this._locsalStorage.setString('theme', themeName);
   }
 
   // componentDidUpdateでdispatchすると再帰的にcomponentDidUpdateが走り、条件によっては無限ループになるので注意。

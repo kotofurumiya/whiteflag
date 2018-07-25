@@ -9,9 +9,26 @@ export class LocalStorage {
     return this._storage.getItem(key) !== null;
   }
 
-  public getJson(key: string): any {
+  public getString(key: string): string {
     const value = this._storage.getItem(key);
-    return value !== null ? JSON.parse(value) : value;
+    if(value !== null) {
+      return value;
+    } else {
+      throw new Error(`キー ${key} がありません。`);
+    }
+  }
+
+  public setString(key: string, value: string): void {
+    this._storage.setItem(key, value);
+  }
+
+  public getJson(key: string): Object {
+    const value = this._storage.getItem(key);
+    if(value !== null) {
+      return JSON.parse(value);
+    } else {
+      throw new Error(`キー ${key} がありません。`);
+    }
   }
 
   public setJson(key: string, value: object): void {

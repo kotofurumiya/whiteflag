@@ -40,7 +40,7 @@ export class AccountStorage {
 
   public getAccountList(): AccountInfo[] {
     if(this._storage.has('accounts')) {
-      return this._storage.getJson('accounts');
+      return this._storage.getJson('accounts') as AccountInfo[];
     } else {
       return [];
     }
