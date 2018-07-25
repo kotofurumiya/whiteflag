@@ -67,6 +67,7 @@ class _App extends React.Component<AppProps> {
 
   protected _addColumnBound: (type: WhiteflagColumnType, query: any) => any;
   protected _removeColumnBound: (columnId: string) => any;
+  protected _changeMainColumnTypeBound: (columnType: WhiteflagColumnType, query: any) => void;
   protected _changeCurrentTootBound: (toot: MastodonTootPost) => void;
   protected _changeCurrentAttachmentsBound: (attachments: MastodonAttachment[]) => void;
   protected _postTootBound: (toot: MastodonTootPost) => Promise<any>;
@@ -90,6 +91,7 @@ class _App extends React.Component<AppProps> {
 
     this._addColumnBound = this._addColumn.bind(this);
     this._removeColumnBound = this._removeColumn.bind(this);
+    this._changeMainColumnTypeBound = this._changeMainColumnType.bind(this);
     this._changeCurrentTootBound = this._changeCurrentToot.bind(this);
     this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(this);
     this._postTootBound = this._postToot.bind(this);
@@ -103,8 +105,9 @@ class _App extends React.Component<AppProps> {
       const whiteflag = new Whiteflag(accountList[0].host);
       this._whiteflag = whiteflag;
       this.props.dispatch(updateAccountInfoList(accountList));
-      this.props.dispatch(addColumn('Local Timeline', WhiteflagColumnType.PUBLIC_LOCAL, this._generateNextColumnId(), {local: true}));
       this.props.dispatch(fetchAccount(whiteflag));
+      this._loadColumns();
+      window.onbeforeunload = () => this._saveColumns();
     }
   }
 
@@ -112,6 +115,33 @@ class _App extends React.Component<AppProps> {
     const next = this._nextColumnId.toString();
     this._nextColumnId += 1;
     return next;
+  }
+
+  protected _loadColumns() {
+    const columnsStr = localStorage.getItem('columns');
+
+    if(columnsStr) {
+      const columns = JSON.parse(columnsStr) as any;
+      const mainColumn = columns.mainColumn as any;
+      const subColumns = columns.subColumns as any[];
+
+      this.props.columnList.forEach((col) => this._removeColumn(col.columnId));
+      this.props.changeMainColumnType(mainColumn.type, mainColumn.query);
+      subColumns.forEach((col) => this._addColumn(col.type, col.query));
+    } else {
+      this._addColumn(WhiteflagColumnType.PUBLIC_LOCAL, {local: true});
+    }
+  }
+
+  protected _saveColumns() {
+    const columnData = {};
+
+    const mainColumn = this.props.mainColumn;
+
+    columnData['mainColumn'] = { type: mainColumn.columnType, query: mainColumn.query };
+    columnData['subColumns'] = this.props.columnList.map((col) => ({type: col.columnType, query: col.query}));
+
+    localStorage.setItem('columns', JSON.stringify(columnData));
   }
 
   protected _showMedia(url: string, type: string) {
@@ -183,6 +213,10 @@ class _App extends React.Component<AppProps> {
 
   protected _preventDefaultDragEvent(evt: React.DragEvent<HTMLElement>) {
     evt.preventDefault();
+  }
+
+  protected _changeMainColumnType(columnType: WhiteflagColumnType, query: any = {}) {
+    this.props.changeMainColumnType(columnType, query);
   }
 
   protected _addColumn(columnType: WhiteflagColumnType, query: any = {}) {
@@ -322,7 +356,7 @@ class _App extends React.Component<AppProps> {
             mainColumn={this.props.mainColumn}
             currentAccount={this.props.currentAccount}
             selectedColumnType={this.props.mainColumn.columnType}
-            changeMainColumnType={this.props.changeMainColumnType}
+            changeMainColumnType={this._changeMainColumnTypeBound}
           />
 
           <main className="main-container">
