@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import { Toot } from './Toot';
-import { MastodonTootStatus, MastodonTootPost } from '../lib/stump';
+import { MastodonTootStatus, MastodonTootPost, MastodonTootPostParams, MastodonAttachment } from '../lib/stump';
 import { WhiteflagColumn, WhiteflagColumnType } from '../lib/whiteflag';
 import {TootInput} from "./TootInput";
 import { ChangeEvent } from 'react';
@@ -13,13 +13,18 @@ interface ColumnProps {
   columnType: string;
   query: object;
   tootList: MastodonTootStatus[];
+  currentToot: MastodonTootPost;
+  currentAttachments: MastodonAttachment[];
   currentDate: Date;
   themeName: string;
   status: string;
+
   showMedia: (url: string, type: string) => any;
   addColumn: (type: WhiteflagColumnType, query: any) => any;
   removeColumn: (id: string) => any;
-  postToot: (toot: MastodonTootPost) => Promise<any>;
+  changeCurrentToot: (toot: MastodonTootPost) => void;
+  changeCurrentAttachments: (attachments: MastodonAttachment[]) => void;
+  postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
   changeTheme: (themeName: string) => any;
   columnList?: WhiteflagColumn[];
   onInit?: () => void;
@@ -105,7 +110,13 @@ export class Column extends React.Component<ColumnProps> {
       return (
         <div className="column toot-column">
           <div className="toot-column-main">
-            <TootInput postToot={this.props.postToot}/>
+            <TootInput
+              currentToot={this.props.currentToot}
+              currentAttachments={this.props.currentAttachments}
+              changeCurrentToot={this.props.changeCurrentToot}
+              changeCurrentAttachments={this.props.changeCurrentAttachments}
+              postToot={this.props.postToot}
+            />
           </div>
         </div>
       );

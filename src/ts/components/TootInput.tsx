@@ -1,8 +1,12 @@
 import * as React from 'react';
-import { MastodonTootStatus, MastodonTootPost, MastodonAttachment } from '../lib/stump';
+import { MastodonTootStatus, MastodonTootPost, MastodonAttachment, MastodonTootPostParams } from '../lib/stump';
 
 export interface TootInputProps {
-  postToot: (toot: MastodonTootPost) => Promise<any>;
+  currentToot: MastodonTootPost;
+  currentAttachments: MastodonAttachment[];
+  changeCurrentToot: (params: MastodonTootPost) => any;
+  changeCurrentAttachments: (attachments: MastodonAttachment[]) => void;
+  postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
 }
 
 interface TootInputState {
@@ -18,6 +22,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
   protected _tootButtonRef: React.RefObject<HTMLButtonElement>;
 
   protected _toggleContentWarningListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  protected _deleteMediaListener: (evt: React.MouseEvent<HTMLElement>) => void;
   protected _onInputListener: (evt: React.KeyboardEvent<any>) => void;
   protected _onKeyDownListener: (evt: React.KeyboardEvent<HTMLElement>) => void;
   protected _postTootListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
@@ -32,6 +37,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     this._tootButtonRef = React.createRef();
 
     this._toggleContentWarningListener = this._toggleContentWarning.bind(this);
+    this._deleteMediaListener = this._deleteMedia.bind(this);
     this._postTootListener = this._postToot.bind(this);
     this._onInputListener = this._onInput.bind(this);
     this._onKeyDownListener = this._onKeyDown.bind(this);
@@ -50,24 +56,39 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     const textArea = this._tootInputRef.current;
     const spoiler = this._spoilerInputRef.current;
 
-    let lengthSum = 0;
+    const tootChangeParams = {};
 
     if(textArea) {
-      lengthSum += textArea.value.length;
+      tootChangeParams['status'] = textArea.value;
     }
 
     if(spoiler) {
-      lengthSum += spoiler.value.length;
+      if(this.state.enableContentWarning) {
+        tootChangeParams['spoiler_text'] = spoiler.value;
+      }
     }
 
-    const remainLength = this._maxLength - lengthSum;
-    this.setState({ remainLength });
+    this.props.changeCurrentToot(this.props.currentToot.replace(tootChangeParams));
   }
 
   protected _onKeyDown(evt: React.KeyboardEvent<HTMLElement>) {
     if(evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
       this._postToot();
+    }
+  }
+
+  protected _deleteMedia(evt: React.MouseEvent<HTMLElement>): void {
+    const id = (evt.target as HTMLElement).dataset.mediaId;
+    const attachments = [...this.props.currentAttachments];
+
+    const removeIndex = attachments.findIndex((a) => a.id === id);
+    if(removeIndex >= 0) {
+      attachments.splice(removeIndex, 1);
+      const media_ids = attachments.map((a) => a.id);
+
+      this.props.changeCurrentAttachments(attachments);
+      this.props.changeCurrentToot(this.props.currentToot.replace({media_ids}));
     }
   }
 
@@ -81,26 +102,9 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
         button.disabled = true;
       }
 
-      const toot = { status: textArea.value };
-
-      if(spoiler && this.state.enableContentWarning) {
-        toot['spoiler_text'] = spoiler.value;
-      }
-
-      this.props.postToot(toot).then((toot) => {
-        // 非同期処理なのでもう一度存在チェックしてから操作。
-        const textAreaAfter = this._tootInputRef.current;
-        const spoilerAfter = this._spoilerInputRef.current;
-
-        if(textAreaAfter) {
-          textAreaAfter.value = '';
-          textAreaAfter.dispatchEvent(new Event('input'));
-        }
-
-        if(spoilerAfter) {
-          spoilerAfter.value = '';
-          spoilerAfter.dispatchEvent(new Event('input'));
-        }
+      this.props.postToot(this.props.currentToot).then((tootStatus) => {
+        this.props.changeCurrentToot(new MastodonTootPost());
+        this.props.changeCurrentAttachments([]);
 
         if(button) {
           button.disabled = false;
@@ -114,11 +118,42 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
   }
 
   render() {
+    let mediaList = this.props.currentAttachments.map((attachment) => {
+      if(attachment.type === 'image' || attachment.type === 'gifv') {
+        return (
+          <div key={attachment.id} className="toot-input-attachment-item">
+            <img className="toot-input-attachment-media" src={attachment.preview_url}/>
+            <div
+              className="toot-input-attachment-delete-button"
+              onClick={this._deleteMediaListener}
+              data-media-id={attachment.id}
+            >
+              x
+            </div>
+          </div>
+        );
+      } else {
+        return (
+          <div key={attachment.id} className="toot-input-attachment-item">
+            <video className="toot-input-attachment-media" src={attachment.preview_url}/>
+            <div
+              className="toot-input-attachment-delete-button"
+              onClick={this._deleteMediaListener}
+              data-media-id={attachment.id}
+            >
+              x
+            </div>
+          </div>
+        );
+      }
+    });
+
     return (
       <div className="toot-input-container">
         {this.state.enableContentWarning ? <input
           className="toot-input-cw"
           placeholder="ここに警告を書いてください"
+          value={this.props.currentToot.spoiler_text}
           onInput={this._onInputListener}
           onKeyDown={this._onKeyDownListener}
           ref={this._spoilerInputRef}
@@ -126,6 +161,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
         <textarea
           className="toot-input"
           placeholder="今なにしてる？"
+          value={this.props.currentToot.status}
           onInput={this._onInputListener}
           onKeyDown={this._onKeyDownListener}
           ref={this._tootInputRef}
@@ -140,7 +176,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           >
             CW
           </button>
-          <div className="toot-count">{this.state.remainLength}</div>
+          <div className="toot-count">{this.props.currentToot.remainTootLength}</div>
         </div>
 
         <div className="toot-button-container">
@@ -151,6 +187,10 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           >
             トゥート！
           </button>
+        </div>
+
+        <div className="toot-input-attachment-container">
+          {mediaList}
         </div>
       </div>
     )

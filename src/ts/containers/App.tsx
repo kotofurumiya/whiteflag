@@ -2,7 +2,14 @@ import * as React from 'react';
 import * as Redux from 'redux';
 import { connect } from 'react-redux';
 
-import { AccountInfo, AccountStorage, MastodonAccount, MastodonTootPost, MastodonUserNotification } from '../lib/stump';
+import {
+  AccountInfo,
+  AccountStorage,
+  MastodonAccount, MastodonAttachment,
+  MastodonTootPost, MastodonTootPostParams,
+  MastodonTootStatus,
+  MastodonUserNotification
+} from '../lib/stump';
 import { Column } from '../components/Column';
 import { Sidebar } from '../components/Sidebar';
 import { TootBar } from '../components/TootBar';
@@ -21,13 +28,15 @@ import {
   changeMainColumn,
   connectColumnToStream, removeColumn,
   updateCurrentDate,
-  changeTheme
+  changeTheme, changeCurrentToot, changeCurrentAttachments
 } from '../actions/whiteflag';
 
 interface AppProps {
   readonly mainColumn: WhiteflagColumn;
   readonly notificationColumn: WhiteflagColumn;
   readonly columnList: WhiteflagColumn[];
+  readonly currentToot: MastodonTootPost;
+  readonly currentAttachments: MastodonAttachment[];
   readonly currentDate: Date;
   readonly accountInfoList: AccountInfo[];
   readonly currentAccount: MastodonAccount;
@@ -48,11 +57,18 @@ class _App extends React.Component<AppProps> {
   protected _nextColumnId: number;
 
   protected _mediaDialogRef: React.RefObject<HTMLDialogElement>;
+  protected _dropzoneRef: React.RefObject<HTMLDialogElement>;
 
   protected _showMediaBound: (url: string, type: string) => any;
   protected _closeMediaBound: () => any;
+  protected _onDragoverBound: (evt: React.DragEvent<HTMLElement>) => any;
+  protected _onDragleaveBound: (evt: React.DragEvent<HTMLElement>) => any;
+  protected _onDropFileBound: (evt: React.DragEvent<HTMLElement>) => any;
+
   protected _addColumnBound: (type: WhiteflagColumnType, query: any) => any;
   protected _removeColumnBound: (columnId: string) => any;
+  protected _changeCurrentTootBound: (toot: MastodonTootPost) => void;
+  protected _changeCurrentAttachmentsBound: (attachments: MastodonAttachment[]) => void;
   protected _postTootBound: (toot: MastodonTootPost) => Promise<any>;
   protected _changeThemeBound: (themeName: string) => any;
 
@@ -64,11 +80,18 @@ class _App extends React.Component<AppProps> {
     this._nextColumnId = 0;
 
     this._mediaDialogRef = React.createRef();
+    this._dropzoneRef = React.createRef();
 
     this._showMediaBound = this._showMedia.bind(this);
     this._closeMediaBound = this._closeMedia.bind(this);
+    this._onDragoverBound = this._onDragover.bind(this);
+    this._onDragleaveBound = this._onDragleave.bind(this);
+    this._onDropFileBound = this._onDropFile.bind(this);
+
     this._addColumnBound = this._addColumn.bind(this);
     this._removeColumnBound = this._removeColumn.bind(this);
+    this._changeCurrentTootBound = this._changeCurrentToot.bind(this);
+    this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(this);
     this._postTootBound = this._postToot.bind(this);
     this._changeThemeBound = this._changeTheme.bind(this);
 
@@ -114,6 +137,54 @@ class _App extends React.Component<AppProps> {
     }
   }
 
+  protected _onDragover(evt: React.DragEvent<HTMLElement>) {
+    evt.preventDefault();
+
+    const dialog = this._dropzoneRef.current;
+    if(dialog && !dialog.open) {
+      dialog.showModal();
+    }
+  }
+
+  protected _onDragleave(evt: React.DragEvent<HTMLElement>) {
+    const dialog = this._dropzoneRef.current;
+    if(dialog && dialog.open) {
+      dialog.close();
+    }
+  }
+
+  protected _onDropFile(evt: React.DragEvent<HTMLElement>) {
+    evt.preventDefault();
+
+    const dialog = this._dropzoneRef.current;
+    if(dialog && dialog.open) {
+      dialog.close();
+    }
+
+    const files = evt.dataTransfer.files as FileList;
+
+    if(this._whiteflag) {
+      const mediaIds = this.props.currentToot.media_ids ? this.props.currentToot.media_ids : [];
+
+      if(mediaIds.length >= 4) {
+        return;
+      }
+
+      for(let i = 0; i < Math.min(files.length - mediaIds.length, 4); i++) {
+        const file = files[i];
+        this._whiteflag.uploadMedia(file).then((attachment) => {
+          mediaIds.push(attachment.id);
+          this._changeCurrentAttachments([...this.props.currentAttachments, attachment]);
+          this._changeCurrentToot(this.props.currentToot.replace({media_ids: mediaIds}));
+        });
+      }
+    }
+  }
+
+  protected _preventDefaultDragEvent(evt: React.DragEvent<HTMLElement>) {
+    evt.preventDefault();
+  }
+
   protected _addColumn(columnType: WhiteflagColumnType, query: any = {}) {
     const title = convertColumnTypeToTitle(columnType);
     this.props.dispatch(addColumn(title, columnType, this._generateNextColumnId(), query));
@@ -123,7 +194,15 @@ class _App extends React.Component<AppProps> {
     this.props.dispatch(removeColumn(columnId));
   }
 
-  protected _postToot(toot: MastodonTootPost): Promise<any> {
+  protected _changeCurrentToot(toot: MastodonTootPost): void {
+    this.props.dispatch(changeCurrentToot(toot));
+  }
+
+  protected _changeCurrentAttachments(attachments: MastodonAttachment[]): void {
+    this.props.dispatch(changeCurrentAttachments(attachments));
+  }
+
+  protected _postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
     if(this._whiteflag) {
       return this._whiteflag.postToot(toot);
     }
@@ -216,12 +295,16 @@ class _App extends React.Component<AppProps> {
             columnType={cData.columnType}
             query={cData.query}
             tootList={cData.tootList}
+            currentToot={this.props.currentToot}
+            currentAttachments={this.props.currentAttachments}
             currentDate={this.props.currentDate}
             themeName={this.props.themeName}
             status={cData.stream.state}
             showMedia={this._showMediaBound}
             addColumn={this._addColumnBound}
             removeColumn={this._removeColumnBound}
+            changeCurrentToot={this._changeCurrentTootBound}
+            changeCurrentAttachments={this._changeCurrentAttachmentsBound}
             postToot={this._postTootBound}
             changeTheme={this._changeThemeBound}
             columnList={this.props.columnList}
@@ -231,7 +314,10 @@ class _App extends React.Component<AppProps> {
       });
 
       return (
-        <div className="whiteflag">
+        <div
+          className="whiteflag"
+          onDragOver={this._onDragoverBound}
+        >
           <Sidebar
             mainColumn={this.props.mainColumn}
             currentAccount={this.props.currentAccount}
@@ -243,11 +329,31 @@ class _App extends React.Component<AppProps> {
             <div className="columns-container">
               {columns}
             </div>
-            {this.props.tootMode === WhiteflagTootMode.BAR_UNDER ? <TootBar postToot={this._postTootBound}/> : undefined}
+            {this.props.tootMode === WhiteflagTootMode.BAR_UNDER ?
+              <TootBar
+                currentToot={this.props.currentToot}
+                currentAttachments={this.props.currentAttachments}
+                changeCurrentToot={this._changeCurrentTootBound}
+                changeCurrentAttachments={this._changeCurrentAttachmentsBound}
+                postToot={this._postTootBound}
+              /> :
+              undefined}
           </main>
 
           <dialog className="media-dialog" onClick={this._closeMediaBound} ref={this._mediaDialogRef}>
             <div className="media-dialog-content"/>
+          </dialog>
+
+          <dialog
+            className="dropzone"
+            onDragEnter={this._preventDefaultDragEvent}
+            onDragOver={this._preventDefaultDragEvent}
+            onDragLeave={this._onDragleaveBound}
+            onDrop={this._onDropFileBound}
+            ref={this._dropzoneRef}>
+            <div className="dropzone-content">
+              ファイルをドロップしてください
+            </div>
           </dialog>
         </div>
       );
@@ -269,6 +375,8 @@ function mapStateToProps(state: AppState): object {
     mainColumn: state.whiteflagData.mainColumn,
     notificationColumn: state.whiteflagData.notificationColumn,
     columnList: state.whiteflagData.columnList,
+    currentToot: state.whiteflagData.currentToot,
+    currentAttachments: state.whiteflagData.currentAttachments,
     currentDate: state.whiteflagData.currentDate,
     themeName: state.whiteflagData.themeName,
     accountInfoList: state.accountData.accountInfoList,

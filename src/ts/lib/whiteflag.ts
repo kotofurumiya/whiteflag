@@ -1,6 +1,6 @@
 import {
   MastodonClient, AuthStorage, AccountStorage,
-  MastodonClientInfo, MastodonClientAuthInfo, AccountInfo, MastodonAccount, MastodonTootStatus
+  MastodonClientInfo, MastodonClientAuthInfo, AccountInfo, MastodonAccount, MastodonTootStatus, MastodonAttachment
 } from './stump';
 import {MastodonStreamType, MastodonTimelineType, MastodonTootPost} from './stump/mastodon';
 
@@ -107,6 +107,10 @@ export class Whiteflag {
 
   public fetchTimeline(timelineType: MastodonTimelineType, query: object = []): Promise<object> {
     return this._client.fetchTimeline(timelineType, query);
+  }
+
+  public uploadMedia(file: File): Promise<MastodonAttachment> {
+    return this._client.uploadMedia(file);
   }
 
   public postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
@@ -224,5 +228,4 @@ export function cloneColumn(column: WhiteflagColumn): WhiteflagColumn {
     },
     tootList: [...column.tootList] // tootはimmutableなのでディープコピー不要。
   };
-
 }

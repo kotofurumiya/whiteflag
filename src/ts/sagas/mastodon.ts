@@ -19,7 +19,6 @@ export function* MastodonFetchTimelineSaga() {
   yield takeEvery('MASTODON_FETCH_TOOTS_REQUEST', fetchTimeline);
 }
 
-
 function* fetchAccount(action: MastodonFetchAccountAction) {
   try {
     let account;
@@ -37,3 +36,4 @@ function* fetchAccount(action: MastodonFetchAccountAction) {
 export function* MastodonFetchAccountSaga() {
   yield takeEvery('MASTODON_FETCH_ACCOUNT_REQUEST', fetchAccount);
 }
+

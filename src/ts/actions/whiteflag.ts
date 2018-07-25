@@ -1,6 +1,11 @@
 import { Action } from 'redux';
 import { Whiteflag, WhiteflagColumnType } from '../lib/whiteflag';
-import { MastodonStreamType } from '../lib/stump/mastodon';
+import {
+  MastodonAttachment,
+  MastodonStreamType,
+  MastodonTootPost,
+  MastodonTootPostParams
+} from '../lib/stump/mastodon';
 
 export interface WhiteflagUpdateCurrentDateAction extends Action {
   readonly type: string;
@@ -50,6 +55,20 @@ export interface WhiteflagStreamChangeConnectionStateAction extends Action {
     readonly columnId: string;
     readonly webSocket: WebSocket | null;
     readonly state: string;
+  }
+}
+
+export interface WhiteflagChangeCurrentTootAction extends Action {
+  readonly type: string;
+  readonly payload: {
+    readonly toot: MastodonTootPost;
+  }
+}
+
+export interface WhiteflagChangeCurrentAttachmentsAction extends Action {
+  readonly type: string;
+  readonly payload: {
+    readonly attachments: MastodonAttachment[];
   }
 }
 
@@ -122,6 +141,24 @@ export function changeConnectionState(columnId: string, webSocket: WebSocket | n
       state
     }
   };
+}
+
+export function changeCurrentToot(toot: MastodonTootPost): WhiteflagChangeCurrentTootAction {
+  return {
+    type: 'WHITEFLAG_CHANGE_CURRENT_TOOT',
+    payload: {
+      toot
+    }
+  }
+}
+
+export function changeCurrentAttachments(attachments: MastodonAttachment[]): WhiteflagChangeCurrentAttachmentsAction {
+  return {
+    type: 'WHITEFLAG_CHANGE_CURRENT_ATTACHMENTS',
+    payload: {
+      attachments
+    }
+  }
 }
 
 export function changeTheme(themeName: string): WhiteflagChangeThemeAction {

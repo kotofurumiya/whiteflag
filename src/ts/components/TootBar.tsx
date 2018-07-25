@@ -1,9 +1,19 @@
 import * as React from 'react';
-import { MastodonTootPost } from '../lib/stump/mastodon';
+import {
+  MastodonAttachment,
+  MastodonTootPost,
+  MastodonTootPostParams,
+  MastodonTootStatus
+} from '../lib/stump/mastodon';
 import {TootInput} from "./TootInput";
 
 export interface TootBarProps {
-  postToot: (toot: MastodonTootPost) => Promise<any>;
+  currentToot: MastodonTootPost;
+  currentAttachments: MastodonAttachment[];
+
+  changeCurrentToot: (toot: MastodonTootPost) => void;
+  changeCurrentAttachments: (attachments: MastodonAttachment[]) => void;
+  postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
 }
 
 
@@ -15,7 +25,13 @@ export class TootBar extends React.Component<TootBarProps> {
   render() {
     return (
       <div className="tootbar" tabIndex={-1}>
-        <TootInput postToot={this.props.postToot}/>
+        <TootInput
+          currentToot={this.props.currentToot}
+          currentAttachments={this.props.currentAttachments}
+          changeCurrentToot={this.props.changeCurrentToot}
+          changeCurrentAttachments={this.props.changeCurrentAttachments}
+          postToot={this.props.postToot}
+        />
       </div>
     );
   }

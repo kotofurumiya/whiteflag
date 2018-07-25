@@ -6,7 +6,7 @@ import {
   MastodonTootAction, MastodonUpdateAccountInfoListAction
 } from '../actions/mastodon';
 
-import { MastodonAccount, MastodonTootStatus } from '../lib/stump';
+import { MastodonAccount, MastodonAttachment, MastodonTootPost, MastodonTootStatus } from '../lib/stump';
 import {
   cloneColumn,
   convertColumnTypeToTitle,
@@ -15,6 +15,8 @@ import {
   WhiteflagTootMode
 } from '../lib/whiteflag';
 import {
+  WhiteflagChangeCurrentAttachmentsAction,
+  WhiteflagChangeCurrentTootAction,
   WhiteflagChangeMainColumnAction, WhiteflagChangeThemeAction,
   WhiteflagColumnAction, WhiteflagColumnAddAction,
   WhiteflagStreamChangeConnectionStateAction, WhiteflagUpdateCurrentDateAction
@@ -26,6 +28,8 @@ export interface WhiteflagState {
   readonly mainColumn: WhiteflagColumn;
   readonly notificationColumn: WhiteflagColumn;
   readonly columnList: WhiteflagColumn[];
+  readonly currentToot: MastodonTootPost;
+  readonly currentAttachments: MastodonAttachment[];
   readonly tootMode: WhiteflagTootMode;
   readonly currentDate: Date;
   readonly themeName: string;
@@ -64,6 +68,8 @@ const initialWhiteflagState: WhiteflagState = {
     tootList: []
   },
   columnList: [],
+  currentToot: new MastodonTootPost(),
+  currentAttachments: [],
   tootMode: WhiteflagTootMode.COLUMN,
   currentDate: new Date(),
   themeName: 'whiteflag'
@@ -108,6 +114,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
   const mainColumn: WhiteflagColumn = cloneColumn(state.mainColumn);
   const notificationColumn: WhiteflagColumn = cloneColumn(state.notificationColumn);
   const columnList: WhiteflagColumn[] = state.columnList.map((c) => cloneColumn(c));
+  const currentToot: MastodonTootPost = state.currentToot;
+  const currentAttachments: MastodonAttachment[] = state.currentAttachments;
   const themeName = state.themeName;
 
   switch(action.type) {
@@ -117,6 +125,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn,
         notificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode: state.tootMode,
         currentDate: (action as WhiteflagUpdateCurrentDateAction).payload.currentDate,
         themeName
@@ -152,6 +162,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn,
         notificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode,
         currentDate: state.currentDate,
         themeName
@@ -181,6 +193,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn,
         notificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode,
         currentDate: state.currentDate,
         themeName
@@ -240,6 +254,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn: newMainColumn,
         notificationColumn: newNotificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode,
         currentDate: state.currentDate,
         themeName
@@ -282,6 +298,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn: newMainColumn,
         notificationColumn,
         columnList: state.columnList,
+        currentToot,
+        currentAttachments,
         tootMode,
         currentDate: state.currentDate,
         themeName
@@ -325,6 +343,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
         mainColumn: newMainColumn,
         notificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode,
         currentDate: state.currentDate,
         themeName
@@ -373,6 +393,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
             mainColumn: newMainColumn,
             notificationColumn,
             columnList,
+            currentToot,
+            currentAttachments,
             tootMode,
             currentDate: state.currentDate,
             themeName
@@ -414,6 +436,8 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
             mainColumn: newMainColumn,
             notificationColumn,
             columnList,
+            currentToot,
+            currentAttachments,
             tootMode,
             currentDate: state.currentDate,
             themeName
@@ -426,11 +450,46 @@ export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, 
       }
     }
 
+    // 現在書いているのトゥートの状態変更。
+    case 'WHITEFLAG_CHANGE_CURRENT_TOOT': {
+      const whiteflagAction = action as WhiteflagChangeCurrentTootAction;
+      const newToot = whiteflagAction.payload.toot;
+
+      return {
+        mainColumn,
+        notificationColumn,
+        columnList,
+        currentToot: newToot,
+        currentAttachments,
+        tootMode: state.tootMode,
+        currentDate: state.currentDate,
+        themeName
+      }
+    }
+
+    // 現在のトゥートの添付ファイル変更。
+    case 'WHITEFLAG_CHANGE_CURRENT_ATTACHMENTS': {
+      const whiteflagAction = action as WhiteflagChangeCurrentAttachmentsAction;
+
+      return {
+        mainColumn,
+        notificationColumn,
+        columnList,
+        currentToot,
+        currentAttachments: whiteflagAction.payload.attachments,
+        tootMode: state.tootMode,
+        currentDate: state.currentDate,
+        themeName
+      }
+    }
+
     case 'WHITEFLAG_CHANGE_THEME': {
       return {
         mainColumn,
         notificationColumn,
         columnList,
+        currentToot,
+        currentAttachments,
         tootMode: state.tootMode,
         currentDate: state.currentDate,
         themeName: (action as WhiteflagChangeThemeAction).payload.themeName

@@ -137,13 +137,69 @@ export interface MastodonTootStatus {
   readonly pinned: boolean | null;
 }
 
-export interface MastodonTootPost {
-  readonly status: string;
+export interface MastodonTootPostParams {
+  readonly status?: string;
   readonly in_reply_to_id?: number;
-  readonly media_ids?: number[];
+  readonly media_ids?: string[];
   readonly sensitive?: boolean;
   readonly spoiler_text?: string;
   readonly visibility?: MastodonTootVisibilityType;
+  readonly language?: string;
+}
+
+export class MastodonTootPost {
+  readonly status: string;
+  readonly in_reply_to_id?: number;
+  readonly media_ids?: string[];
+  readonly sensitive?: boolean;
+  readonly spoiler_text?: string;
+  readonly visibility?: MastodonTootVisibilityType;
+  readonly language?: string;
+
+  constructor(params: MastodonTootPostParams = {}) {
+    this.status = 'status' in params ? params.status! : '';
+
+    if(params.in_reply_to_id) { this.in_reply_to_id = params.in_reply_to_id; }
+    if(params.media_ids) { this.media_ids = params.media_ids; }
+    if(params.sensitive) { this.sensitive = params.sensitive; }
+    if(params.spoiler_text) { this.spoiler_text = params.spoiler_text; }
+    if(params.visibility) { this.visibility = params.visibility; }
+    if(params.language) { this.language = params.language; }
+  }
+  
+  get remainTootLength(): number {
+    const maxLength = 500;
+    
+    let lengthSum = this.status.length;
+    if(this.spoiler_text) {
+      lengthSum += this.spoiler_text.length;
+    }
+    
+    return maxLength - lengthSum;
+  }
+
+  replace(params: MastodonTootPostParams = {}): MastodonTootPost {
+    const status = 'status' in params ? params.status : this.status;
+
+    const newTootParams = {
+      status
+    };
+
+    if(this.in_reply_to_id) { newTootParams['in_reply_to_id'] = this.in_reply_to_id; }
+    if(this.media_ids) { newTootParams['media_ids'] = this.media_ids; }
+    if(this.sensitive) { newTootParams['sensitive'] = this.sensitive; }
+    if(this.spoiler_text) { newTootParams['spoiler_text'] = this.spoiler_text; }
+    if(this.visibility) { newTootParams['visibility'] = this.visibility; }
+    if(this.language) { newTootParams['language'] = this.language; }
+
+    for(const p in params) {
+      if(params.hasOwnProperty(p)) {
+        newTootParams[p] = params[p];
+      }
+    }
+
+    return new MastodonTootPost(newTootParams);
+  }
 }
 
 export class MastodonClient {
@@ -335,7 +391,21 @@ export class MastodonClient {
     }
   }
 
-  public postToot(toot: MastodonTootPost) {
+  public uploadMedia(file: File): Promise<MastodonAttachment> {
+    const data = new FormData();
+    data.append('file', file);
+
+    return this._fetchPostApi(`https://${this._host}/api/v1/media`, data)
+      .then((json) => {
+        if('error' in json) {
+          throw new Error(json.error);
+        }
+
+        return json;
+      });
+  }
+
+  public postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
     const data = new FormData();
     data.append('status', toot.status);
 
@@ -344,8 +414,9 @@ export class MastodonClient {
     }
 
     if(toot.media_ids) {
-      for(const mediaId in toot.media_ids) {
-        data.append('media_ids[]', mediaId.toString());
+      for(const mediaId of toot.media_ids) {
+        data.append('media_ids[]', mediaId);
+        console.log('media_ids[]=', mediaId);
       }
     }
 
@@ -368,7 +439,7 @@ export class MastodonClient {
         }
 
         return json;
-      })
+      });
   }
 
   // typeはpublic, public:local, user, hashtag, hashtag:local
