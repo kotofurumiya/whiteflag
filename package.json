@@ -1,7 +1,7 @@
 {
   "name": "whiteflag",
   "productName": "Whiteflag",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A mastodon client for mimumedon.com",
   "main": "./src/js/main.min.js",
   "scripts": {
