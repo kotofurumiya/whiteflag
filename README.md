@@ -24,3 +24,10 @@ $ npm run build
 ```
 $ npm run package
 ```
+
+Win/macそれぞれのインストーラのみを作成することもできます。
+
+```
+$ npm run package:win
+$ npm run package:mac
+```
