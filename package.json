@@ -15,6 +15,11 @@
   },
   "author": "Koto Furumiya <kotofurumiya@gmail.com> (https://sbfl.net/)",
   "license": "MIT",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
   "dependencies": {
     "history": "^4.7.2",
     "react": "^16.3.2",
@@ -44,7 +49,9 @@
     "gulp": "^4.0.0",
     "gulp-cssmin": "^0.2.0",
     "gulp-htmlmin": "^4.0.0",
+    "husky": "^0.14.3",
     "prettier": "^1.13.7",
+    "pretty-quick": "^1.6.0",
     "ts-loader": "^4.2.0",
     "typescript": "^2.8.3",
     "webpack": "^4.8.0",
