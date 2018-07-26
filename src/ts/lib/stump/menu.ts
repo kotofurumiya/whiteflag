@@ -3,37 +3,35 @@ export function createWinMenuTemplate(): Electron.MenuItemConstructorOptions[] {
     {
       label: '編集',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        { label: '元に戻す', role: 'undo' },
+        { label: 'やり直す', role: 'redo' },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'pasteandmatchstyle' },
-        { role: 'delete' },
-        { role: 'selectall' }
+        { label: '切り取り', role: 'cut' },
+        { label: 'コピー', role: 'copy' },
+        { label: '貼り付け', role: 'paste' },
+        { label: '貼り付けてスタイルを合わせる', role: 'pasteandmatchstyle' },
+        { label: '削除', role: 'delete' },
+        { label: '全てを選択', role: 'selectall' }
       ]
     },
     {
       label: '表示',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
+        { label: 'リロード', role: 'reload' },
+        { label: '強制的にリロード', role: 'forcereload' },
+        { label: 'デベロッパーツール', role: 'toggledevtools' },
         { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
+        { label: '実際のサイズ', role: 'resetzoom' },
+        { label: '拡大', role: 'zoomin' },
+        { label: '縮小', role: 'zoomout' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { label: 'フルスクリーン', role: 'togglefullscreen' }
       ]
     },
     {
+      label: 'ウィンドウ',
       role: 'window',
-      submenu: [{ role: 'minimize' }, { role: 'close' }]
-    },
-    {
-      role: 'help'
+      submenu: [{ label: '最小化', role: 'minimize' }, { label: '閉じる', role: 'close' }]
     }
   ];
 }
@@ -47,28 +45,28 @@ export function createDarwinMenuTemplate(
       submenu: [
         { role: 'about' },
         { type: 'separator' },
-        { role: 'services', submenu: [] },
+        { label: 'サービス', role: 'services', submenu: [] },
         { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
+        { label: '隠す', role: 'hide' },
+        { label: '他を隠す', role: 'hideothers' },
+        { label: '表示', role: 'unhide' },
         { type: 'separator' },
-        { role: 'quit' }
+        { label: '終了', role: 'quit' }
       ]
     },
 
     {
       label: '編集',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        { label: '元に戻す', role: 'undo' },
+        { label: 'やり直す', role: 'redo' },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'pasteandmatchstyle' },
-        { role: 'delete' },
-        { role: 'selectall' },
+        { label: '切り取り', role: 'cut' },
+        { label: 'コピー', role: 'copy' },
+        { label: '貼り付け', role: 'paste' },
+        { label: '貼り付けてスタイルを合わせる', role: 'pasteandmatchstyle' },
+        { label: '削除', role: 'delete' },
+        { label: '全てを選択', role: 'selectall' },
         { type: 'separator' },
         {
           label: 'スピーチ',
@@ -79,29 +77,27 @@ export function createDarwinMenuTemplate(
     {
       label: '表示',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
+        { label: 'リロード', role: 'reload' },
+        { label: '強制的にリロード', role: 'forcereload' },
+        { label: 'デベロッパーツール', role: 'toggledevtools' },
         { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
+        { label: '実際のサイズ', role: 'resetzoom' },
+        { label: '拡大', role: 'zoomin' },
+        { label: '縮小', role: 'zoomout' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { label: 'フルスクリーン', role: 'togglefullscreen' }
       ]
     },
     {
+      label: 'ウィンドウ',
       role: 'window',
       submenu: [
-        { role: 'close' },
-        { role: 'minimize' },
-        { role: 'zoom' },
+        { label: '閉じる', role: 'close' },
+        { label: 'しまう', role: 'minimize' },
+        { label: '拡大/縮小', role: 'zoom' },
         { type: 'separator' },
-        { role: 'front' }
+        { label: '手前に移動', role: 'front' }
       ]
-    },
-    {
-      role: 'help'
     }
   ];
 }
