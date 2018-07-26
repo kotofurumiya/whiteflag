@@ -415,6 +415,8 @@ export function whiteflagReducer(
         // updateのときはトゥートを追加。
         case 'update': {
           const tootList = targetColumn.tootList;
+          const newTootList = [...filterToots([data]), ...tootList];
+
           const newColumn = {
             columnId,
             columnType: targetColumn.columnType,
@@ -422,7 +424,7 @@ export function whiteflagReducer(
             query: targetColumn.query,
             isInitialized: targetColumn.isInitialized,
             stream: targetColumn.stream,
-            tootList: [...filterToots([data]), ...tootList]
+            tootList: newTootList.slice(0, 10000)
           };
 
           if (isMainColumn) {
