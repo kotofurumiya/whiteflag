@@ -79,10 +79,10 @@ export class Column extends React.Component<ColumnProps> {
   protected _scrollToTop(evt: React.MouseEvent<HTMLElement>) {
     const main = this._columnMainRef.current;
 
-    if(main) {
+    if (main) {
       const topToot = main.querySelector('.toot-container:first-child');
-      if(topToot) {
-        topToot.scrollIntoView({behavior: 'smooth', block: 'start'});
+      if (topToot) {
+        topToot.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }
