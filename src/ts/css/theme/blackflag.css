@@ -21,9 +21,9 @@
 }
 
 .toot-action-button {
-  filter: brightness(2.0);
+  filter: brightness(2.0) saturate(0%);
 }
 
 .toot-action-button:hover {
-  filter: brightness(2.8);
+  filter: brightness(2.8) saturate(0%);
 }

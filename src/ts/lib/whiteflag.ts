@@ -117,6 +117,22 @@ export class Whiteflag {
     return this._client.postToot(toot);
   }
 
+  public favouriteToot(tootId: string): Promise<MastodonTootStatus> {
+    return this._client.favouriteToot(tootId);
+  }
+
+  public unfavouriteToot(tootId: string): Promise<MastodonTootStatus> {
+    return this._client.unfavouriteToot(tootId);
+  }
+
+  public boostToot(tootId: string): Promise<MastodonTootStatus> {
+    return this._client.boostToot(tootId);
+  }
+
+  public unboostToot(tootId: string): Promise<MastodonTootStatus> {
+    return this._client.unboostToot(tootId);
+  }
+
   public connectTimeline(type: MastodonStreamType, query: object = {}): WebSocket {
     return this._client.createWebSocketConnection(type, query);
   }

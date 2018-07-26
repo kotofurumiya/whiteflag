@@ -442,6 +442,22 @@ export class MastodonClient {
       });
   }
 
+  public favouriteToot(id: string): Promise<MastodonTootStatus> {
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/favourite`, new FormData());
+  }
+
+  public unfavouriteToot(id: string): Promise<MastodonTootStatus> {
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unfavourite`, new FormData());
+  }
+
+  public boostToot(id: string): Promise<MastodonTootStatus> {
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/reblog`, new FormData());
+  }
+
+  public unboostToot(id: string): Promise<MastodonTootStatus> {
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unreblog`, new FormData());
+  }
+
   // typeはpublic, public:local, user, hashtag, hashtag:local
   public createWebSocketConnection(type: MastodonStreamType, query: object = {}): WebSocket {
     if(!this._accountInfo) {

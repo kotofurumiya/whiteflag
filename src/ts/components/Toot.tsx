@@ -4,10 +4,19 @@ import { MastodonTootStatus, MastodonAttachment } from '../lib/stump';
 export interface TootProps {
   toot: MastodonTootStatus;
   currentDate: Date;
+  favourite: (tootId: string) => Promise<MastodonTootStatus>;
+  unfavourite: (tootId: string) => Promise<MastodonTootStatus>;
+  boost: (tootId: string) => Promise<MastodonTootStatus>;
+  unboost: (tootId: string) => Promise<MastodonTootStatus>;
   showMedia: (url: string, type: string) => any;
 }
 
-export class Toot extends React.Component<TootProps> {
+interface TootState {
+  reblogged: boolean;
+  favourited: boolean;
+}
+
+export class Toot extends React.Component<TootProps, TootState> {
   protected _timestamp: number;
   protected _timestampDate: Date;
 
@@ -16,6 +25,9 @@ export class Toot extends React.Component<TootProps> {
 
   protected _onClickImgListener: (event: React.MouseEvent<HTMLImageElement>) => any;
   protected _onClickVideoListener: (event: React.MouseEvent<HTMLVideoElement>) => any;
+
+  protected _onClickFavouriteButtonListener: (event: React.MouseEvent<HTMLElement>) => any;
+  protected _onClickBoostButtonListener: (event: React.MouseEvent<HTMLElement>) => any;
 
   constructor(props:TootProps) {
     super(props);
@@ -28,6 +40,13 @@ export class Toot extends React.Component<TootProps> {
 
     this._onClickImgListener = this._onClickImg.bind(this);
     this._onClickVideoListener = this._onClickVideo.bind(this);
+
+    this._onClickFavouriteButtonListener = this._onClickFavouriteButton.bind(this);
+    this._onClickBoostButtonListener = this._onClickBoostButton.bind(this);
+
+    const reblogged = this.props.toot.reblogged ? this.props.toot.reblogged : false;
+    const favourited = this.props.toot.favourited ? this.props.toot.favourited : false;
+    this.state = { reblogged , favourited };
   }
 
   // 参戦IDをクリックした時の動作。
@@ -63,6 +82,30 @@ export class Toot extends React.Component<TootProps> {
   protected _onClickVideo(evt: Event) {
     const media = evt.target as HTMLVideoElement;
     this.props.showMedia(media.src, 'video');
+  }
+
+  // ブーストボタンクリック時の動作。
+  protected _onClickBoostButton(evt: React.MouseEvent<HTMLElement>) {
+    if(this.state.reblogged) {
+      this.props.unboost(this.props.toot.id);
+      this.setState({reblogged: false});
+    } else {
+      if(confirm('このトゥートをブーストしますか？')) {
+        this.props.boost(this.props.toot.id);
+        this.setState({reblogged: true});
+      }
+    }
+  }
+
+  protected _onClickFavouriteButton(evt: React.MouseEvent<HTMLElement>) {
+    if(this.state.favourited) {
+      this.props.unfavourite(this.props.toot.id);
+    } else {
+      this.props.favourite(this.props.toot.id);
+    }
+
+    const favourited = !this.state.favourited;
+    this.setState({favourited})
   }
 
   protected _generateRelativeTimestamp() {
@@ -159,9 +202,22 @@ export class Toot extends React.Component<TootProps> {
               </div>
 
               <div className="toot-action-bar">
-                <button className="toot-action-button toot-action-reply"/>
-                <button className="toot-action-button toot-action-boost"/>
-                <button className="toot-action-button toot-action-favourite"/>
+                <button
+                  className="toot-action-button toot-action-reply"
+                  data-toot-id={this.props.toot.id}
+                />
+                <button
+                  className="toot-action-button toot-action-boost"
+                  onClick={this._onClickBoostButtonListener}
+                  data-toot-id={this.props.toot.id}
+                  data-activated={this.state.reblogged}
+                />
+                <button
+                  className="toot-action-button toot-action-favourite"
+                  onClick={this._onClickFavouriteButtonListener}
+                  data-toot-id={this.props.toot.id}
+                  data-activated={this.state.favourited}
+                />
               </div>
             </div>
           </div>

@@ -19,6 +19,10 @@ interface ColumnProps {
   themeName: string;
   status: string;
 
+  favourite: (tootId: string) => Promise<MastodonTootStatus>;
+  unfavourite: (tootId: string) => Promise<MastodonTootStatus>;
+  boost: (tootId: string) => Promise<MastodonTootStatus>;
+  unboost: (tootId: string) => Promise<MastodonTootStatus>;
   showMedia: (url: string, type: string) => any;
   addColumn: (type: WhiteflagColumnType, query: any) => any;
   removeColumn: (id: string) => any;
@@ -101,7 +105,15 @@ export class Column extends React.Component<ColumnProps> {
           classNames="toot-transition"
           timeout={ {enter: 1000, exit: 100} }
         >
-          <Toot key={toot.id} toot={toot} currentDate={this.props.currentDate} showMedia={this.props.showMedia}/>
+          <Toot
+            key={toot.id}
+            toot={toot}
+            currentDate={this.props.currentDate}
+            boost={this.props.boost}
+            unboost={this.props.unboost}
+            favourite={this.props.favourite}
+            unfavourite={this.props.unfavourite}
+            showMedia={this.props.showMedia}/>
         </CSSTransition>
       );
     }

@@ -72,6 +72,10 @@ class _App extends React.Component<AppProps> {
   protected _changeCurrentTootBound: (toot: MastodonTootPost) => void;
   protected _changeCurrentAttachmentsBound: (attachments: MastodonAttachment[]) => void;
   protected _postTootBound: (toot: MastodonTootPost) => Promise<any>;
+  protected _favouriteTootBound: (tootId: string) => Promise<MastodonTootStatus>;
+  protected _unfavouriteTootBound: (tootId: string) => Promise<MastodonTootStatus>;
+  protected _boostTootBound: (tootId: string) => Promise<MastodonTootStatus>;
+  protected _unboostTootBound: (tootId: string) => Promise<MastodonTootStatus>;
   protected _changeThemeBound: (themeName: string) => any;
 
   constructor(props: AppProps) {
@@ -99,6 +103,10 @@ class _App extends React.Component<AppProps> {
     this._changeCurrentTootBound = this._changeCurrentToot.bind(this);
     this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(this);
     this._postTootBound = this._postToot.bind(this);
+    this._favouriteTootBound = this._favouriteToot.bind(this);
+    this._unfavouriteTootBound = this._unfavouriteToot.bind(this);
+    this._boostTootBound = this._boostToot.bind(this);
+    this._unboostTootBound = this._unboostToot.bind(this);
     this._changeThemeBound = this._changeTheme.bind(this);
 
     setInterval(() => {
@@ -252,6 +260,38 @@ class _App extends React.Component<AppProps> {
 
     return Promise.reject('whiteflagが初期化されていません。');
   }
+
+  protected _favouriteToot(tootId: string): Promise<MastodonTootStatus> {
+    if(this._whiteflag) {
+      return this._whiteflag.favouriteToot(tootId);
+    }
+
+    return Promise.reject('whiteflagが初期化されていません。')
+  }
+
+  protected _unfavouriteToot(tootId: string): Promise<MastodonTootStatus> {
+    if(this._whiteflag) {
+      return this._whiteflag.unfavouriteToot(tootId);
+    }
+
+    return Promise.reject('whiteflagが初期化されていません。')
+  }
+
+  protected _boostToot(tootId: string): Promise<MastodonTootStatus> {
+    if(this._whiteflag) {
+      return this._whiteflag.boostToot(tootId);
+    }
+
+    return Promise.reject('whiteflagが初期化されていません。')
+  }
+
+  protected _unboostToot(tootId: string): Promise<MastodonTootStatus> {
+    if(this._whiteflag) {
+      return this._whiteflag.unboostToot(tootId);
+    }
+
+    return Promise.reject('whiteflagが初期化されていません。')
+  }
   
   protected _changeTheme(themeName: string) {
     const themePath = `css/theme/${themeName}.css`;
@@ -350,6 +390,10 @@ class _App extends React.Component<AppProps> {
             changeCurrentToot={this._changeCurrentTootBound}
             changeCurrentAttachments={this._changeCurrentAttachmentsBound}
             postToot={this._postTootBound}
+            favourite={this._favouriteTootBound}
+            unfavourite={this._unfavouriteTootBound}
+            boost={this._boostTootBound}
+            unboost={this._unboostTootBound}
             changeTheme={this._changeThemeBound}
             columnList={this.props.columnList}
             onInit={onInit}
