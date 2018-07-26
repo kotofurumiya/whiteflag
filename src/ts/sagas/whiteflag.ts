@@ -1,10 +1,16 @@
-import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
-import { WhiteflagStreamConnectionAction, changeConnectionState } from '../actions/whiteflag';
+import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
+import {
+  WhiteflagStreamConnectionAction,
+  changeConnectionState
+} from '../actions/whiteflag';
 
 function* connectStream(action: WhiteflagStreamConnectionAction) {
   try {
     const query = action.payload.query;
-    const webSocket = action.payload.whiteflag.connectTimeline(action.payload.streamType, query);
+    const webSocket = action.payload.whiteflag.connectTimeline(
+      action.payload.streamType,
+      query
+    );
     const state = yield call(() => {
       return new Promise((resolve, reject) => {
         webSocket.addEventListener('open', (evt) => {
@@ -19,7 +25,9 @@ function* connectStream(action: WhiteflagStreamConnectionAction) {
 
     yield put(changeConnectionState(action.payload.columnId, webSocket, state));
   } catch (e) {
-    yield put(changeConnectionState(action.payload.columnId,null, 'disconnected'));
+    yield put(
+      changeConnectionState(action.payload.columnId, null, 'disconnected')
+    );
   }
 }
 

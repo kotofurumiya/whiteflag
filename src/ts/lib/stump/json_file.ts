@@ -12,11 +12,11 @@ export class JsonFile {
 
   protected _readJsonFile(defaultValue: object | null = null): object {
     // すでにjsonファイルが存在すれば読み込む。
-    if(fs.existsSync(this._path)) {
-      const jsonText: string = fs.readFileSync(this._path, 'utf-8' );
+    if (fs.existsSync(this._path)) {
+      const jsonText: string = fs.readFileSync(this._path, 'utf-8');
       try {
         return JSON.parse(jsonText);
-      } catch(e) {
+      } catch (e) {
         console.error(`JSONのパースに失敗しました： ${this._path}`);
         return defaultValue ? defaultValue : {};
       }
@@ -31,7 +31,7 @@ export class JsonFile {
 
     try {
       fs.writeFileSync(this._path, jsonText);
-    } catch(e) {
+    } catch (e) {
       console.error(`ファイルの書き込みに失敗しました： ${this._path}`);
     }
   }

@@ -5,7 +5,7 @@ export class MastodonUserNotification {
     let title = notificationData.account.display_name;
     let body = '';
 
-    switch(notificationData.type) {
+    switch (notificationData.type) {
       case MastodonNotificationType.MENTION: {
         break;
       }
@@ -26,11 +26,14 @@ export class MastodonUserNotification {
       }
     }
 
-    if(notificationData.status) {
-      body = notificationData.status.content.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g, '');
+    if (notificationData.status) {
+      body = notificationData.status.content.replace(
+        /<("[^"]*"|'[^']*'|[^'">])*>/g,
+        ''
+      );
     }
 
-    const notification = new Notification(title,{
+    const notification = new Notification(title, {
       body,
       icon: notificationData.account.avatar
     });

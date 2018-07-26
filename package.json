@@ -5,6 +5,7 @@
   "description": "A mastodon client for mimumedon.com",
   "main": "./src/js/main.min.js",
   "scripts": {
+    "format": "prettier --write \"src/ts/**/*.{ts,js,tsx,jsx}\"",
     "build": "gulp build && electron-packager ./src/js/ Whiteflag --platform=win32,darwin --arch=x64 --icon=resources/icon --asar --overwrite --out bin",
     "package": "node create_wininstaller.js && electron-installer-dmg ./bin/Whiteflag-darwin-x64/Whiteflag.app Whiteflag --out ./release/whiteflag-mac/ --overwrite",
     "package:win": "node create_wininstaller.js",
@@ -43,6 +44,7 @@
     "gulp": "^4.0.0",
     "gulp-cssmin": "^0.2.0",
     "gulp-htmlmin": "^4.0.0",
+    "prettier": "^1.13.7",
     "ts-loader": "^4.2.0",
     "typescript": "^2.8.3",
     "webpack": "^4.8.0",

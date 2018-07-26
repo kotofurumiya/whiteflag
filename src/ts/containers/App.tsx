@@ -4,9 +4,12 @@ import { connect } from 'react-redux';
 
 import {
   AccountInfo,
-  AccountStorage, LocalStorage,
-  MastodonAccount, MastodonAttachment,
-  MastodonTootPost, MastodonTootPostParams,
+  AccountStorage,
+  LocalStorage,
+  MastodonAccount,
+  MastodonAttachment,
+  MastodonTootPost,
+  MastodonTootPostParams,
   MastodonTootStatus,
   MastodonUserNotification
 } from '../lib/stump';
@@ -14,21 +17,31 @@ import { Column } from '../components/Column';
 import { Sidebar } from '../components/Sidebar';
 import { TootBar } from '../components/TootBar';
 
-import { fetchAccount, fetchToots, receiveEvent, updateAccountInfoList } from '../actions/mastodon';
+import {
+  fetchAccount,
+  fetchToots,
+  receiveEvent,
+  updateAccountInfoList
+} from '../actions/mastodon';
 import {
   convertColumnTypeToStreamType,
-  convertColumnTypeToTimelineType, convertColumnTypeToTitle,
+  convertColumnTypeToTimelineType,
+  convertColumnTypeToTitle,
   Whiteflag,
   WhiteflagColumn,
-  WhiteflagColumnType, WhiteflagTootMode
+  WhiteflagColumnType,
+  WhiteflagTootMode
 } from '../lib/whiteflag';
 import {
   addColumn,
   changeConnectionState,
   changeMainColumn,
-  connectColumnToStream, removeColumn,
+  connectColumnToStream,
+  removeColumn,
   updateCurrentDate,
-  changeTheme, changeCurrentToot, changeCurrentAttachments
+  changeTheme,
+  changeCurrentToot,
+  changeCurrentAttachments
 } from '../actions/whiteflag';
 
 interface AppProps {
@@ -68,12 +81,21 @@ class _App extends React.Component<AppProps> {
 
   protected _addColumnBound: (type: WhiteflagColumnType, query: any) => any;
   protected _removeColumnBound: (columnId: string) => any;
-  protected _changeMainColumnTypeBound: (columnType: WhiteflagColumnType, query: any) => void;
+  protected _changeMainColumnTypeBound: (
+    columnType: WhiteflagColumnType,
+    query: any
+  ) => void;
   protected _changeCurrentTootBound: (toot: MastodonTootPost) => void;
-  protected _changeCurrentAttachmentsBound: (attachments: MastodonAttachment[]) => void;
+  protected _changeCurrentAttachmentsBound: (
+    attachments: MastodonAttachment[]
+  ) => void;
   protected _postTootBound: (toot: MastodonTootPost) => Promise<any>;
-  protected _favouriteTootBound: (tootId: string) => Promise<MastodonTootStatus>;
-  protected _unfavouriteTootBound: (tootId: string) => Promise<MastodonTootStatus>;
+  protected _favouriteTootBound: (
+    tootId: string
+  ) => Promise<MastodonTootStatus>;
+  protected _unfavouriteTootBound: (
+    tootId: string
+  ) => Promise<MastodonTootStatus>;
   protected _boostTootBound: (tootId: string) => Promise<MastodonTootStatus>;
   protected _unboostTootBound: (tootId: string) => Promise<MastodonTootStatus>;
   protected _changeThemeBound: (themeName: string) => any;
@@ -101,7 +123,9 @@ class _App extends React.Component<AppProps> {
     this._removeColumnBound = this._removeColumn.bind(this);
     this._changeMainColumnTypeBound = this._changeMainColumnType.bind(this);
     this._changeCurrentTootBound = this._changeCurrentToot.bind(this);
-    this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(this);
+    this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(
+      this
+    );
     this._postTootBound = this._postToot.bind(this);
     this._favouriteTootBound = this._favouriteToot.bind(this);
     this._unfavouriteTootBound = this._unfavouriteToot.bind(this);
@@ -113,14 +137,14 @@ class _App extends React.Component<AppProps> {
       this.props.dispatch(updateCurrentDate(new Date()));
     }, 1000);
 
-    if(accountList.length > 0) {
+    if (accountList.length > 0) {
       const whiteflag = new Whiteflag(accountList[0].host);
       this._whiteflag = whiteflag;
       this.props.dispatch(updateAccountInfoList(accountList));
       this.props.dispatch(fetchAccount(whiteflag));
       this._loadColumns();
 
-      if(this._locsalStorage.has('theme')) {
+      if (this._locsalStorage.has('theme')) {
         this._changeTheme(this._locsalStorage.getString('theme'));
       }
 
@@ -137,7 +161,7 @@ class _App extends React.Component<AppProps> {
   protected _loadColumns() {
     const columnsStr = localStorage.getItem('columns');
 
-    if(columnsStr) {
+    if (columnsStr) {
       const columns = JSON.parse(columnsStr) as any;
       const mainColumn = columns.mainColumn as any;
       const subColumns = columns.subColumns as any[];
@@ -146,7 +170,7 @@ class _App extends React.Component<AppProps> {
       this.props.changeMainColumnType(mainColumn.type, mainColumn.query);
       subColumns.forEach((col) => this._addColumn(col.type, col.query));
     } else {
-      this._addColumn(WhiteflagColumnType.PUBLIC_LOCAL, {local: true});
+      this._addColumn(WhiteflagColumnType.PUBLIC_LOCAL, { local: true });
     }
   }
 
@@ -155,17 +179,25 @@ class _App extends React.Component<AppProps> {
 
     const mainColumn = this.props.mainColumn;
 
-    columnData['mainColumn'] = { type: mainColumn.columnType, query: mainColumn.query };
-    columnData['subColumns'] = this.props.columnList.map((col) => ({type: col.columnType, query: col.query}));
+    columnData['mainColumn'] = {
+      type: mainColumn.columnType,
+      query: mainColumn.query
+    };
+    columnData['subColumns'] = this.props.columnList.map((col) => ({
+      type: col.columnType,
+      query: col.query
+    }));
 
     this._locsalStorage.setJson('columns', columnData);
   }
 
   protected _showMedia(url: string, type: string) {
     const dialog = this._mediaDialogRef.current;
-    if(dialog) {
-      const contentElement = dialog.querySelector('.media-dialog-content') as HTMLDivElement;
-      if(type === 'video') {
+    if (dialog) {
+      const contentElement = dialog.querySelector(
+        '.media-dialog-content'
+      ) as HTMLDivElement;
+      if (type === 'video') {
         contentElement.innerHTML = `<video src=${url} controls>`;
       } else {
         contentElement.innerHTML = `<img src=${url}>`;
@@ -177,8 +209,10 @@ class _App extends React.Component<AppProps> {
 
   protected _closeMedia() {
     const dialog = this._mediaDialogRef.current;
-    if(dialog && dialog.open) {
-      const contentElement = dialog.querySelector('.media-dialog-content') as HTMLDivElement;
+    if (dialog && dialog.open) {
+      const contentElement = dialog.querySelector(
+        '.media-dialog-content'
+      ) as HTMLDivElement;
       contentElement.innerHTML = '';
       dialog.close();
     }
@@ -188,14 +222,14 @@ class _App extends React.Component<AppProps> {
     evt.preventDefault();
 
     const dialog = this._dropzoneRef.current;
-    if(dialog && !dialog.open) {
+    if (dialog && !dialog.open) {
       dialog.showModal();
     }
   }
 
   protected _onDragleave(evt: React.DragEvent<HTMLElement>) {
     const dialog = this._dropzoneRef.current;
-    if(dialog && dialog.open) {
+    if (dialog && dialog.open) {
       dialog.close();
     }
   }
@@ -204,25 +238,32 @@ class _App extends React.Component<AppProps> {
     evt.preventDefault();
 
     const dialog = this._dropzoneRef.current;
-    if(dialog && dialog.open) {
+    if (dialog && dialog.open) {
       dialog.close();
     }
 
     const files = evt.dataTransfer.files as FileList;
 
-    if(this._whiteflag) {
-      const mediaIds = this.props.currentToot.media_ids ? this.props.currentToot.media_ids : [];
+    if (this._whiteflag) {
+      const mediaIds = this.props.currentToot.media_ids
+        ? this.props.currentToot.media_ids
+        : [];
 
-      if(mediaIds.length >= 4) {
+      if (mediaIds.length >= 4) {
         return;
       }
 
-      for(let i = 0; i < Math.min(files.length - mediaIds.length, 4); i++) {
+      for (let i = 0; i < Math.min(files.length - mediaIds.length, 4); i++) {
         const file = files[i];
         this._whiteflag.uploadMedia(file).then((attachment) => {
           mediaIds.push(attachment.id);
-          this._changeCurrentAttachments([...this.props.currentAttachments, attachment]);
-          this._changeCurrentToot(this.props.currentToot.replace({media_ids: mediaIds}));
+          this._changeCurrentAttachments([
+            ...this.props.currentAttachments,
+            attachment
+          ]);
+          this._changeCurrentToot(
+            this.props.currentToot.replace({ media_ids: mediaIds })
+          );
         });
       }
     }
@@ -232,13 +273,18 @@ class _App extends React.Component<AppProps> {
     evt.preventDefault();
   }
 
-  protected _changeMainColumnType(columnType: WhiteflagColumnType, query: any = {}) {
+  protected _changeMainColumnType(
+    columnType: WhiteflagColumnType,
+    query: any = {}
+  ) {
     this.props.changeMainColumnType(columnType, query);
   }
 
   protected _addColumn(columnType: WhiteflagColumnType, query: any = {}) {
     const title = convertColumnTypeToTitle(columnType);
-    this.props.dispatch(addColumn(title, columnType, this._generateNextColumnId(), query));
+    this.props.dispatch(
+      addColumn(title, columnType, this._generateNextColumnId(), query)
+    );
   }
 
   protected _removeColumn(columnId: string) {
@@ -254,7 +300,7 @@ class _App extends React.Component<AppProps> {
   }
 
   protected _postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
-    if(this._whiteflag) {
+    if (this._whiteflag) {
       return this._whiteflag.postToot(toot);
     }
 
@@ -262,37 +308,37 @@ class _App extends React.Component<AppProps> {
   }
 
   protected _favouriteToot(tootId: string): Promise<MastodonTootStatus> {
-    if(this._whiteflag) {
+    if (this._whiteflag) {
       return this._whiteflag.favouriteToot(tootId);
     }
 
-    return Promise.reject('whiteflagが初期化されていません。')
+    return Promise.reject('whiteflagが初期化されていません。');
   }
 
   protected _unfavouriteToot(tootId: string): Promise<MastodonTootStatus> {
-    if(this._whiteflag) {
+    if (this._whiteflag) {
       return this._whiteflag.unfavouriteToot(tootId);
     }
 
-    return Promise.reject('whiteflagが初期化されていません。')
+    return Promise.reject('whiteflagが初期化されていません。');
   }
 
   protected _boostToot(tootId: string): Promise<MastodonTootStatus> {
-    if(this._whiteflag) {
+    if (this._whiteflag) {
       return this._whiteflag.boostToot(tootId);
     }
 
-    return Promise.reject('whiteflagが初期化されていません。')
+    return Promise.reject('whiteflagが初期化されていません。');
   }
 
   protected _unboostToot(tootId: string): Promise<MastodonTootStatus> {
-    if(this._whiteflag) {
+    if (this._whiteflag) {
       return this._whiteflag.unboostToot(tootId);
     }
 
-    return Promise.reject('whiteflagが初期化されていません。')
+    return Promise.reject('whiteflagが初期化されていません。');
   }
-  
+
   protected _changeTheme(themeName: string) {
     const themePath = `css/theme/${themeName}.css`;
     const linkElement = document.querySelector('#theme-css') as HTMLLinkElement;
@@ -305,52 +351,84 @@ class _App extends React.Component<AppProps> {
   // componentDidUpdateでdispatchすると再帰的にcomponentDidUpdateが走り、条件によっては無限ループになるので注意。
   // static getDerivedStateFromPropsに処理を移すべきかもしれない。
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-    if(this._whiteflag && this.props.accountInfoList.length > 0) {
-
-      for(const column of [this.props.mainColumn, this.props.notificationColumn, ...this.props.columnList]) {
-        const isNotWhiteflagColumn = !column.columnType.startsWith('whiteflag:');
-        const supportsStreaming = column.columnType !== WhiteflagColumnType.ACCOUNT &&
-                                  column.columnType !== WhiteflagColumnType.CURRENT_ACCOUNT;
-        const needsConnect = column.stream.state === 'uninitialized' || column.stream.state === 'disconnected';
+    if (this._whiteflag && this.props.accountInfoList.length > 0) {
+      for (const column of [
+        this.props.mainColumn,
+        this.props.notificationColumn,
+        ...this.props.columnList
+      ]) {
+        const isNotWhiteflagColumn = !column.columnType.startsWith(
+          'whiteflag:'
+        );
+        const supportsStreaming =
+          column.columnType !== WhiteflagColumnType.ACCOUNT &&
+          column.columnType !== WhiteflagColumnType.CURRENT_ACCOUNT;
+        const needsConnect =
+          column.stream.state === 'uninitialized' ||
+          column.stream.state === 'disconnected';
 
         // Whiteflag独自カラムではない（タイムライン表示カラムである）かつ
         // ストリーミングに対応しているかつ
         // コネクションを張る必要がある時は、ストリームにつなぎに行く。
         if (isNotWhiteflagColumn && supportsStreaming && needsConnect) {
-          this.props.dispatch(changeConnectionState(column.columnId, null, 'connecting'));
+          this.props.dispatch(
+            changeConnectionState(column.columnId, null, 'connecting')
+          );
           const streamType = convertColumnTypeToStreamType(column.columnType);
-          this.props.dispatch(connectColumnToStream(this._whiteflag, column.columnId, streamType, column.stream.query));
+          this.props.dispatch(
+            connectColumnToStream(
+              this._whiteflag,
+              column.columnId,
+              streamType,
+              column.stream.query
+            )
+          );
         }
 
         // ストリームに接続済みの場合、メッセージを受信したときに
         // イベントをカラムに伝える。
         if (column.stream.state === 'connected') {
-          this.props.dispatch(changeConnectionState(column.columnId, column.stream.webSocket, 'listening'));
+          this.props.dispatch(
+            changeConnectionState(
+              column.columnId,
+              column.stream.webSocket,
+              'listening'
+            )
+          );
           column.stream.webSocket!.addEventListener('message', (message) => {
             const data = JSON.parse(message.data);
             const eventType = data.event;
             const payload = JSON.parse(data.payload);
 
             // notificationの場合は通知を表示する。
-            if(column.columnId === this.props.notificationColumn.columnId) {
-              if(eventType === 'notification') {
+            if (column.columnId === this.props.notificationColumn.columnId) {
+              if (eventType === 'notification') {
                 const notification = new MastodonUserNotification(payload);
               }
             } else {
-              this.props.dispatch(receiveEvent(column.columnId, eventType, payload));
+              this.props.dispatch(
+                receiveEvent(column.columnId, eventType, payload)
+              );
             }
           });
 
           // 接続が切れたら状態をdisconnectedにする。
-          column.stream.webSocket!.addEventListener('close', (evt: CloseEvent) => {
-            // 正常終了ではない場合のみ。
-            if(!evt.wasClean) {
-              this.props.dispatch(changeConnectionState(column.columnId,null, 'disconnected'));
+          column.stream.webSocket!.addEventListener(
+            'close',
+            (evt: CloseEvent) => {
+              // 正常終了ではない場合のみ。
+              if (!evt.wasClean) {
+                this.props.dispatch(
+                  changeConnectionState(column.columnId, null, 'disconnected')
+                );
+              }
             }
-          });
+          );
 
           column.stream.webSocket!.addEventListener('error', (evt) => {
-            this.props.dispatch(changeConnectionState(column.columnId,null, 'disconnected'));
+            this.props.dispatch(
+              changeConnectionState(column.columnId, null, 'disconnected')
+            );
           });
         }
       }
@@ -360,52 +438,61 @@ class _App extends React.Component<AppProps> {
   render() {
     const accountList = this._accountStorage.getAccountList();
 
-    if(accountList.length > 0) {
-      const columns = [this.props.mainColumn, ...this.props.columnList].map((cData) => {
-        let onInit;
+    if (accountList.length > 0) {
+      const columns = [this.props.mainColumn, ...this.props.columnList].map(
+        (cData) => {
+          let onInit;
 
-        if (cData.columnType.startsWith('whiteflag:')) {
-          onInit = () => {};
-        } else {
-          const timelineType = convertColumnTypeToTimelineType(cData.columnType);
-          onInit = () => this.props.dispatch(fetchToots(this._whiteflag!, cData.columnId, timelineType, cData.query));
+          if (cData.columnType.startsWith('whiteflag:')) {
+            onInit = () => {};
+          } else {
+            const timelineType = convertColumnTypeToTimelineType(
+              cData.columnType
+            );
+            onInit = () =>
+              this.props.dispatch(
+                fetchToots(
+                  this._whiteflag!,
+                  cData.columnId,
+                  timelineType,
+                  cData.query
+                )
+              );
+          }
+
+          return (
+            <Column
+              key={cData.columnId}
+              title={cData.title}
+              columnId={cData.columnId}
+              columnType={cData.columnType}
+              query={cData.query}
+              tootList={cData.tootList}
+              currentToot={this.props.currentToot}
+              currentAttachments={this.props.currentAttachments}
+              currentDate={this.props.currentDate}
+              themeName={this.props.themeName}
+              status={cData.stream.state}
+              showMedia={this._showMediaBound}
+              addColumn={this._addColumnBound}
+              removeColumn={this._removeColumnBound}
+              changeCurrentToot={this._changeCurrentTootBound}
+              changeCurrentAttachments={this._changeCurrentAttachmentsBound}
+              postToot={this._postTootBound}
+              favourite={this._favouriteTootBound}
+              unfavourite={this._unfavouriteTootBound}
+              boost={this._boostTootBound}
+              unboost={this._unboostTootBound}
+              changeTheme={this._changeThemeBound}
+              columnList={this.props.columnList}
+              onInit={onInit}
+            />
+          );
         }
-
-        return (
-          <Column
-            key={cData.columnId}
-            title={cData.title}
-            columnId={cData.columnId}
-            columnType={cData.columnType}
-            query={cData.query}
-            tootList={cData.tootList}
-            currentToot={this.props.currentToot}
-            currentAttachments={this.props.currentAttachments}
-            currentDate={this.props.currentDate}
-            themeName={this.props.themeName}
-            status={cData.stream.state}
-            showMedia={this._showMediaBound}
-            addColumn={this._addColumnBound}
-            removeColumn={this._removeColumnBound}
-            changeCurrentToot={this._changeCurrentTootBound}
-            changeCurrentAttachments={this._changeCurrentAttachmentsBound}
-            postToot={this._postTootBound}
-            favourite={this._favouriteTootBound}
-            unfavourite={this._unfavouriteTootBound}
-            boost={this._boostTootBound}
-            unboost={this._unboostTootBound}
-            changeTheme={this._changeThemeBound}
-            columnList={this.props.columnList}
-            onInit={onInit}
-          />
-        );
-      });
+      );
 
       return (
-        <div
-          className="whiteflag"
-          onDragOver={this._onDragoverBound}
-        >
+        <div className="whiteflag" onDragOver={this._onDragoverBound}>
           <Sidebar
             mainColumn={this.props.mainColumn}
             currentAccount={this.props.currentAccount}
@@ -414,22 +501,26 @@ class _App extends React.Component<AppProps> {
           />
 
           <main className="main-container">
-            <div className="columns-container">
-              {columns}
-            </div>
-            {this.props.tootMode === WhiteflagTootMode.BAR_UNDER ?
+            <div className="columns-container">{columns}</div>
+            {this.props.tootMode === WhiteflagTootMode.BAR_UNDER ? (
               <TootBar
                 currentToot={this.props.currentToot}
                 currentAttachments={this.props.currentAttachments}
                 changeCurrentToot={this._changeCurrentTootBound}
                 changeCurrentAttachments={this._changeCurrentAttachmentsBound}
                 postToot={this._postTootBound}
-              /> :
-              undefined}
+              />
+            ) : (
+              undefined
+            )}
           </main>
 
-          <dialog className="media-dialog" onClick={this._closeMediaBound} ref={this._mediaDialogRef}>
-            <div className="media-dialog-content"/>
+          <dialog
+            className="media-dialog"
+            onClick={this._closeMediaBound}
+            ref={this._mediaDialogRef}
+          >
+            <div className="media-dialog-content" />
           </dialog>
 
           <dialog
@@ -438,7 +529,8 @@ class _App extends React.Component<AppProps> {
             onDragOver={this._preventDefaultDragEvent}
             onDragLeave={this._onDragleaveBound}
             onDrop={this._onDropFileBound}
-            ref={this._dropzoneRef}>
+            ref={this._dropzoneRef}
+          >
             <div className="dropzone-content">
               ファイルをドロップしてください
             </div>
@@ -451,7 +543,9 @@ class _App extends React.Component<AppProps> {
       <div className="no-account-page">
         <div className="no-account-container">
           <h1>アカウントを追加してください</h1>
-          <a className="button" href="register.html">アカウントを追加する</a>
+          <a className="button" href="register.html">
+            アカウントを追加する
+          </a>
         </div>
       </div>
     );
@@ -476,11 +570,11 @@ function mapStateToProps(state: AppState): object {
 function mapDispatchToProps(dispatch: Redux.Dispatch): object {
   return {
     changeMainColumnType: (type: WhiteflagColumnType, query: any = {}) => {
-      if(type === WhiteflagColumnType.PUBLIC_LOCAL) {
+      if (type === WhiteflagColumnType.PUBLIC_LOCAL) {
         query['local'] = true;
-      } else if(type === WhiteflagColumnType.HASHTAG_STUMP) {
+      } else if (type === WhiteflagColumnType.HASHTAG_STUMP) {
         query['tag'] = '切り株';
-      } else if(type === WhiteflagColumnType.HASHTAG_FLAG) {
+      } else if (type === WhiteflagColumnType.HASHTAG_FLAG) {
         query['tag'] = '旗';
       }
 
@@ -488,7 +582,10 @@ function mapDispatchToProps(dispatch: Redux.Dispatch): object {
     },
 
     dispatch
-  }
+  };
 }
 
-export const App = connect(mapStateToProps, mapDispatchToProps)(_App);
+export const App = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(_App);

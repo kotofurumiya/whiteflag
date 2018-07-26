@@ -11,7 +11,7 @@ export class LocalStorage {
 
   public getString(key: string): string {
     const value = this._storage.getItem(key);
-    if(value !== null) {
+    if (value !== null) {
       return value;
     } else {
       throw new Error(`キー ${key} がありません。`);
@@ -24,7 +24,7 @@ export class LocalStorage {
 
   public getJson(key: string): Object {
     const value = this._storage.getItem(key);
-    if(value !== null) {
+    if (value !== null) {
       return JSON.parse(value);
     } else {
       throw new Error(`キー ${key} がありません。`);

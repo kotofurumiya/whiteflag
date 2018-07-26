@@ -1,10 +1,10 @@
 import { LocalStorage } from '../stump';
 
 interface AuthInfo {
-  host: string,
-  id: string,
-  clientId: string,
-  clientSecret: string,
+  host: string;
+  id: string;
+  clientId: string;
+  clientSecret: string;
 }
 
 export class AuthStorage {
@@ -27,8 +27,12 @@ export class AuthStorage {
   public addAuth(auth: AuthInfo) {
     const map = this.getAuthMap();
 
-    const authIsValid = 'host' in auth && 'id' in auth && 'clientId' in auth && 'clientSecret' in auth;
-    if(!authIsValid) {
+    const authIsValid =
+      'host' in auth &&
+      'id' in auth &&
+      'clientId' in auth &&
+      'clientSecret' in auth;
+    if (!authIsValid) {
       return false;
     }
 
@@ -39,7 +43,7 @@ export class AuthStorage {
   }
 
   public getAuthMap(): Object {
-    if(this._storage.has('auth')) {
+    if (this._storage.has('auth')) {
       return this._storage.getJson('auth');
     } else {
       return {};

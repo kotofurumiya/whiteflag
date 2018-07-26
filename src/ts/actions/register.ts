@@ -4,7 +4,7 @@ export interface RegisterAction extends Action {
   readonly type: string;
   readonly payload: {
     host: string;
-  }
+  };
 }
 
 export function setHost(host: string): RegisterAction {
@@ -13,5 +13,5 @@ export function setHost(host: string): RegisterAction {
     payload: {
       host
     }
-  }
+  };
 }

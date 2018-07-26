@@ -85,8 +85,8 @@ export interface MastodonAttachment {
     readonly frame_rate?: number;
     readonly duration?: any; // TODO: 型を調べる
     readonly bitrate?: number;
-    readonly focus?: { readonly x: number, readonly y: number }
-  }
+    readonly focus?: { readonly x: number; readonly y: number };
+  };
   readonly description: string | null;
 }
 
@@ -132,7 +132,10 @@ export interface MastodonTootStatus {
   readonly media_attachments: MastodonAttachment[];
   readonly mentions: MastodonMention[];
   readonly tags: MastodonTag[];
-  readonly application: { readonly name: string, readonly website: string | null } | null;
+  readonly application: {
+    readonly name: string;
+    readonly website: string | null;
+  } | null;
   readonly language: string | null;
   readonly pinned: boolean | null;
 }
@@ -159,22 +162,34 @@ export class MastodonTootPost {
   constructor(params: MastodonTootPostParams = {}) {
     this.status = 'status' in params ? params.status! : '';
 
-    if(params.in_reply_to_id) { this.in_reply_to_id = params.in_reply_to_id; }
-    if(params.media_ids) { this.media_ids = params.media_ids; }
-    if(params.sensitive) { this.sensitive = params.sensitive; }
-    if(params.spoiler_text) { this.spoiler_text = params.spoiler_text; }
-    if(params.visibility) { this.visibility = params.visibility; }
-    if(params.language) { this.language = params.language; }
+    if (params.in_reply_to_id) {
+      this.in_reply_to_id = params.in_reply_to_id;
+    }
+    if (params.media_ids) {
+      this.media_ids = params.media_ids;
+    }
+    if (params.sensitive) {
+      this.sensitive = params.sensitive;
+    }
+    if (params.spoiler_text) {
+      this.spoiler_text = params.spoiler_text;
+    }
+    if (params.visibility) {
+      this.visibility = params.visibility;
+    }
+    if (params.language) {
+      this.language = params.language;
+    }
   }
-  
+
   get remainTootLength(): number {
     const maxLength = 500;
-    
+
     let lengthSum = this.status.length;
-    if(this.spoiler_text) {
+    if (this.spoiler_text) {
       lengthSum += this.spoiler_text.length;
     }
-    
+
     return maxLength - lengthSum;
   }
 
@@ -185,15 +200,27 @@ export class MastodonTootPost {
       status
     };
 
-    if(this.in_reply_to_id) { newTootParams['in_reply_to_id'] = this.in_reply_to_id; }
-    if(this.media_ids) { newTootParams['media_ids'] = this.media_ids; }
-    if(this.sensitive) { newTootParams['sensitive'] = this.sensitive; }
-    if(this.spoiler_text) { newTootParams['spoiler_text'] = this.spoiler_text; }
-    if(this.visibility) { newTootParams['visibility'] = this.visibility; }
-    if(this.language) { newTootParams['language'] = this.language; }
+    if (this.in_reply_to_id) {
+      newTootParams['in_reply_to_id'] = this.in_reply_to_id;
+    }
+    if (this.media_ids) {
+      newTootParams['media_ids'] = this.media_ids;
+    }
+    if (this.sensitive) {
+      newTootParams['sensitive'] = this.sensitive;
+    }
+    if (this.spoiler_text) {
+      newTootParams['spoiler_text'] = this.spoiler_text;
+    }
+    if (this.visibility) {
+      newTootParams['visibility'] = this.visibility;
+    }
+    if (this.language) {
+      newTootParams['language'] = this.language;
+    }
 
-    for(const p in params) {
-      if(params.hasOwnProperty(p)) {
+    for (const p in params) {
+      if (params.hasOwnProperty(p)) {
         newTootParams[p] = params[p];
       }
     }
@@ -207,21 +234,27 @@ export class MastodonClient {
   protected _authInfo: MastodonClientAuthInfo | null;
   protected _accountInfo: AccountInfo | null;
 
-  constructor(host: string, authInfo: MastodonClientAuthInfo | null = null, accountInfo: AccountInfo | null = null) {
+  constructor(
+    host: string,
+    authInfo: MastodonClientAuthInfo | null = null,
+    accountInfo: AccountInfo | null = null
+  ) {
     this._host = host;
     this._authInfo = authInfo;
     this._accountInfo = accountInfo;
   }
 
   // APIを叩いてクライアントを登録する。
-  public registerClient(clientInfo: MastodonClientInfo): Promise<MastodonClientAuthInfo> {
+  public registerClient(
+    clientInfo: MastodonClientInfo
+  ): Promise<MastodonClientAuthInfo> {
     // 登録に必要なデータはclient_name, redirect_uris, scopeの3つ。
     // websiteは任意。
     const formData: FormData = new FormData();
     formData.append('client_name', clientInfo.clientName);
     formData.append('redirect_uris', clientInfo.redirectUris);
     formData.append('scopes', clientInfo.scopes.join(' '));
-    if(clientInfo.website) {
+    if (clientInfo.website) {
       formData.append('website', clientInfo.website);
     }
 
@@ -230,10 +263,11 @@ export class MastodonClient {
     return fetch(`https://${this._host}/api/v1/apps`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json'
+        Accept: 'application/json'
       },
       body: formData
-    }).then((response) => response.json())
+    })
+      .then((response) => response.json())
       .then((json) => {
         const authInfo: MastodonClientAuthInfo = {
           id: json.id,
@@ -254,11 +288,12 @@ export class MastodonClient {
   // リダイレクトしない場合は「urn:ietf:wg:oauth:2.0:oob」を指定する。
   // scopeは「read」「write」「follow」の3種類。
   public createAuthUrl(redirectUri: string, scopeList: string[]): string {
-    if(!this._authInfo) {
+    if (!this._authInfo) {
       throw new Error('クライアントの認証情報がありません。');
     }
 
-    const client_id = 'client_id=' + encodeURIComponent(this._authInfo.clientId);
+    const client_id =
+      'client_id=' + encodeURIComponent(this._authInfo.clientId);
     const response_type = 'response_type=code';
     const redirect_uri = 'redirect_uri=' + encodeURIComponent(redirectUri);
     const scope = 'scope=' + encodeURIComponent(scopeList.join(' '));
@@ -270,7 +305,7 @@ export class MastodonClient {
 
   // 認証コードを用いてアクセストークンを取得する。
   public requestAccessToken(code: string): Promise<string> {
-    if(!this._authInfo) {
+    if (!this._authInfo) {
       return Promise.reject('クライアントの認証情報がありません。');
     }
 
@@ -286,12 +321,13 @@ export class MastodonClient {
     return fetch(`https://${this._host}/oauth/token`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json'
+        Accept: 'application/json'
       },
       body: formData
-    }).then((response) => response.json())
+    })
+      .then((response) => response.json())
       .then((json) => {
-        if(json.error) {
+        if (json.error) {
           console.error(json.error);
           throw new Error('コード認証に失敗しました。');
         }
@@ -310,28 +346,28 @@ export class MastodonClient {
   }
 
   protected _fetchGetApi(endpoint: string): Promise<any> {
-    if(!this._accountInfo || !this._accountInfo.accessToken) {
+    if (!this._accountInfo || !this._accountInfo.accessToken) {
       return Promise.reject('アカウントの認証情報がありません。');
     }
 
     return fetch(endpoint, {
       headers: {
-        'Authorization': ` Bearer ${this._accountInfo.accessToken}`,
-        'Accept': 'application/json'
+        Authorization: ` Bearer ${this._accountInfo.accessToken}`,
+        Accept: 'application/json'
       }
     }).then((response) => response.json());
   }
 
   protected _fetchPostApi(endpoint: string, data: FormData): Promise<any> {
-    if(!this._accountInfo || !this._accountInfo.accessToken) {
+    if (!this._accountInfo || !this._accountInfo.accessToken) {
       return Promise.reject('アカウントの認証情報がありません。');
     }
 
     return fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': ` Bearer ${this._accountInfo.accessToken}`,
-        'Accept': 'application/json'
+        Authorization: ` Bearer ${this._accountInfo.accessToken}`,
+        Accept: 'application/json'
       },
       body: data
     }).then((response) => response.json());
@@ -339,55 +375,70 @@ export class MastodonClient {
 
   // 現在のアカウントの情報を取得する。
   public fetchCurrentAccount(): Promise<MastodonAccount> {
-    return this._fetchGetApi(`https://${this._host}/api/v1/accounts/verify_credentials`)
-      .then((json) => {
-        if('error' in json) {
-          throw new Error('Error:' + json.error);
-        }
+    return this._fetchGetApi(
+      `https://${this._host}/api/v1/accounts/verify_credentials`
+    ).then((json) => {
+      if ('error' in json) {
+        throw new Error('Error:' + json.error);
+      }
 
-        this._accountInfo = {
-          host: this._host,
-          id: json.id,
-          username: json.username,
-          displayName: json.display_name,
-          acct: json.acct,
-          accessToken: this._accountInfo!.accessToken
-        };
+      this._accountInfo = {
+        host: this._host,
+        id: json.id,
+        username: json.username,
+        displayName: json.display_name,
+        acct: json.acct,
+        accessToken: this._accountInfo!.accessToken
+      };
 
-        return json;
-      });
+      return json;
+    });
   }
 
   public fetchAccount(id: number): Promise<MastodonAccount> {
-    return this._fetchGetApi(`https://${this._host}/api/v1/accounts/${id}`)
-      .then((json) => {
-        if('error' in json) {
-          throw new Error(json.error);
-        }
+    return this._fetchGetApi(
+      `https://${this._host}/api/v1/accounts/${id}`
+    ).then((json) => {
+      if ('error' in json) {
+        throw new Error(json.error);
+      }
 
-        return json;
-      });
+      return json;
+    });
   }
 
-  public fetchTimeline(timelineType: MastodonTimelineType, query: object = {}): Promise<object> {
+  public fetchTimeline(
+    timelineType: MastodonTimelineType,
+    query: object = {}
+  ): Promise<object> {
     const params = new URLSearchParams();
-    for(const [key, value] of Object.entries(query)) {
+    for (const [key, value] of Object.entries(query)) {
       params.append(key, value);
     }
 
     const paramStr = params.toString();
 
-    switch(timelineType) {
+    switch (timelineType) {
       case MastodonTimelineType.HOME:
-        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/home?${paramStr}`);
+        return this._fetchGetApi(
+          `https://${this._host}/api/v1/timelines/home?${paramStr}`
+        );
       case MastodonTimelineType.PUBLIC:
-        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/public?${paramStr}`);
+        return this._fetchGetApi(
+          `https://${this._host}/api/v1/timelines/public?${paramStr}`
+        );
       case MastodonTimelineType.ACCOUNT:
-        return this._fetchGetApi(`https://${this._host}/api/v1/accounts/${query['id']}/statuses?${paramStr}`);
+        return this._fetchGetApi(
+          `https://${this._host}/api/v1/accounts/${
+            query['id']
+          }/statuses?${paramStr}`
+        );
       case MastodonTimelineType.TAG:
-        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/tag/${query['tag']}`);
+        return this._fetchGetApi(
+          `https://${this._host}/api/v1/timelines/tag/${query['tag']}`
+        );
       default:
-        throw new Error(`無効なタイムラインタイプ：${timelineType}。`)
+        throw new Error(`無効なタイムラインタイプ：${timelineType}。`);
     }
   }
 
@@ -395,84 +446,106 @@ export class MastodonClient {
     const data = new FormData();
     data.append('file', file);
 
-    return this._fetchPostApi(`https://${this._host}/api/v1/media`, data)
-      .then((json) => {
-        if('error' in json) {
+    return this._fetchPostApi(`https://${this._host}/api/v1/media`, data).then(
+      (json) => {
+        if ('error' in json) {
           throw new Error(json.error);
         }
 
         return json;
-      });
+      }
+    );
   }
 
   public postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
     const data = new FormData();
     data.append('status', toot.status);
 
-    if(toot.in_reply_to_id) {
+    if (toot.in_reply_to_id) {
       data.append('in_reply_to_id', toot.in_reply_to_id.toString());
     }
 
-    if(toot.media_ids) {
-      for(const mediaId of toot.media_ids) {
+    if (toot.media_ids) {
+      for (const mediaId of toot.media_ids) {
         data.append('media_ids[]', mediaId);
         console.log('media_ids[]=', mediaId);
       }
     }
 
-    if(toot.sensitive) {
+    if (toot.sensitive) {
       data.append('sensitive', toot.sensitive.toString());
     }
 
-    if(toot.spoiler_text) {
-      data.append('spoiler_text', toot.spoiler_text)
+    if (toot.spoiler_text) {
+      data.append('spoiler_text', toot.spoiler_text);
     }
 
-    if(toot.visibility) {
+    if (toot.visibility) {
       data.append('visibility', toot.visibility);
     }
 
-    return this._fetchPostApi(`https://${this._host}/api/v1/statuses`, data)
-      .then((json) => {
-        if('error' in json) {
-          throw new Error(json.error);
-        }
+    return this._fetchPostApi(
+      `https://${this._host}/api/v1/statuses`,
+      data
+    ).then((json) => {
+      if ('error' in json) {
+        throw new Error(json.error);
+      }
 
-        return json;
-      });
+      return json;
+    });
   }
 
   public favouriteToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/favourite`, new FormData());
+    return this._fetchPostApi(
+      `https://${this._host}/api/v1/statuses/${id}/favourite`,
+      new FormData()
+    );
   }
 
   public unfavouriteToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unfavourite`, new FormData());
+    return this._fetchPostApi(
+      `https://${this._host}/api/v1/statuses/${id}/unfavourite`,
+      new FormData()
+    );
   }
 
   public boostToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/reblog`, new FormData());
+    return this._fetchPostApi(
+      `https://${this._host}/api/v1/statuses/${id}/reblog`,
+      new FormData()
+    );
   }
 
   public unboostToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unreblog`, new FormData());
+    return this._fetchPostApi(
+      `https://${this._host}/api/v1/statuses/${id}/unreblog`,
+      new FormData()
+    );
   }
 
   // typeはpublic, public:local, user, hashtag, hashtag:local
-  public createWebSocketConnection(type: MastodonStreamType, query: object = {}): WebSocket {
-    if(!this._accountInfo) {
+  public createWebSocketConnection(
+    type: MastodonStreamType,
+    query: object = {}
+  ): WebSocket {
+    if (!this._accountInfo) {
       throw new Error('アカウントの認証情報がありません。');
     }
 
     const params = new URLSearchParams();
-    for(const [key, value] of Object.entries(query)) {
+    for (const [key, value] of Object.entries(query)) {
       params.append(key, value);
     }
 
     const paramStr = params.toString();
 
     const token = this._accountInfo.accessToken;
-    return new WebSocket(`wss://${this._host}/api/v1/streaming?access_token=${token}&stream=${type}&${paramStr}`);
+    return new WebSocket(
+      `wss://${
+        this._host
+      }/api/v1/streaming?access_token=${token}&stream=${type}&${paramStr}`
+    );
   }
 
   public get accountInfo(): AccountInfo | null {

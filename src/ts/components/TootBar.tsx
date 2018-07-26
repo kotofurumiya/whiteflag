@@ -5,7 +5,7 @@ import {
   MastodonTootPostParams,
   MastodonTootStatus
 } from '../lib/stump/mastodon';
-import {TootInput} from "./TootInput";
+import { TootInput } from './TootInput';
 
 export interface TootBarProps {
   currentToot: MastodonTootPost;
@@ -16,9 +16,8 @@ export interface TootBarProps {
   postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
 }
 
-
 export class TootBar extends React.Component<TootBarProps> {
-  constructor(props:TootBarProps) {
+  constructor(props: TootBarProps) {
     super(props);
   }
 

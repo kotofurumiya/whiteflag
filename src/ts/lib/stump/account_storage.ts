@@ -1,12 +1,12 @@
 import { LocalStorage } from '../stump';
 
 export interface AccountInfo {
-  host: string,
-  id: string,
-  username: string,
-  displayName: string,
-  acct: string
-  accessToken: string
+  host: string;
+  id: string;
+  username: string;
+  displayName: string;
+  acct: string;
+  accessToken: string;
 }
 
 export class AccountStorage {
@@ -24,7 +24,7 @@ export class AccountStorage {
 
   public removeAccountByIndex(index: number) {
     const list = this.getAccountList();
-    if(index < 0 || index > list.length) {
+    if (index < 0 || index > list.length) {
       return;
     }
 
@@ -39,7 +39,7 @@ export class AccountStorage {
   }
 
   public getAccountList(): AccountInfo[] {
-    if(this._storage.has('accounts')) {
+    if (this._storage.has('accounts')) {
       return this._storage.getJson('accounts') as AccountInfo[];
     } else {
       return [];

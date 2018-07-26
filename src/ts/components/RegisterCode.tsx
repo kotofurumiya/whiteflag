@@ -3,11 +3,11 @@ import * as Redux from 'redux';
 import { connect } from 'react-redux';
 import { Whiteflag } from '../lib/whiteflag';
 import { RegisterState } from '../reducers/register';
-import { remote } from "electron";
+import { remote } from 'electron';
 import Menu = Electron.Menu;
 
 interface RegisterCodeState {
-  register: RegisterState
+  register: RegisterState;
 }
 
 interface RegisterCodeProps {
@@ -40,9 +40,10 @@ class _RegisterCode extends React.Component<RegisterCodeProps, {}> {
       const whiteflag = new Whiteflag(host);
       const code = (this.refs.authCodeInput as HTMLInputElement).value;
 
-      whiteflag.authUser(code)
+      whiteflag
+        .authUser(code)
         .then((success: boolean) => {
-          if(success) {
+          if (success) {
             location.href = 'index.html';
           } else {
             alert('認証に失敗しました。');
@@ -68,8 +69,12 @@ class _RegisterCode extends React.Component<RegisterCodeProps, {}> {
           />
         </div>
         <div className="page-content">
-          <button className="auth-button" onClick={auth}>認証する</button>
-          <a className="button cancel-button" href="index.html">キャンセル</a>
+          <button className="auth-button" onClick={auth}>
+            認証する
+          </button>
+          <a className="button cancel-button" href="index.html">
+            キャンセル
+          </a>
         </div>
       </div>
     );

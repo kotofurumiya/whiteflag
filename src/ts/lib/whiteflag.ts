@@ -1,8 +1,19 @@
 import {
-  MastodonClient, AuthStorage, AccountStorage,
-  MastodonClientInfo, MastodonClientAuthInfo, AccountInfo, MastodonAccount, MastodonTootStatus, MastodonAttachment
+  MastodonClient,
+  AuthStorage,
+  AccountStorage,
+  MastodonClientInfo,
+  MastodonClientAuthInfo,
+  AccountInfo,
+  MastodonAccount,
+  MastodonTootStatus,
+  MastodonAttachment
 } from './stump';
-import {MastodonStreamType, MastodonTimelineType, MastodonTootPost} from './stump/mastodon';
+import {
+  MastodonStreamType,
+  MastodonTimelineType,
+  MastodonTootPost
+} from './stump/mastodon';
 
 export enum WhiteflagColumnType {
   WHITEFLAG_TOOT = 'whiteflag:toot',
@@ -24,10 +35,10 @@ export interface WhiteflagColumn {
   readonly query: object;
   readonly isInitialized: boolean;
   readonly stream: {
-    readonly webSocket: WebSocket | null,
+    readonly webSocket: WebSocket | null;
     readonly query: object;
-    readonly state: string
-  }
+    readonly state: string;
+  };
   readonly tootList: MastodonTootStatus[];
 }
 
@@ -50,7 +61,7 @@ export class Whiteflag {
       clientName: 'Whiteflag',
       redirectUris: 'urn:ietf:wg:oauth:2.0:oob',
       scopes: ['read', 'write', 'follow'],
-      website: 'https://sbfl.net/app/whiteflag/',
+      website: 'https://sbfl.net/app/whiteflag/'
     };
 
     this._authStorage = new AuthStorage();
@@ -73,7 +84,8 @@ export class Whiteflag {
   }
 
   public registerClient(): Promise<boolean> {
-    return this._client.registerClient(this._clientInfo)
+    return this._client
+      .registerClient(this._clientInfo)
       .then((auth: MastodonClientAuthInfo) => {
         return this._authStorage.addAuth({
           host: this._host,
@@ -82,12 +94,15 @@ export class Whiteflag {
       });
   }
 
-  public createAuthUrl(redirectUri: string = 'urn:ietf:wg:oauth:2.0:oob'): string {
+  public createAuthUrl(
+    redirectUri: string = 'urn:ietf:wg:oauth:2.0:oob'
+  ): string {
     return this._client.createAuthUrl(redirectUri, ['read', 'write', 'follow']);
   }
 
   public authUser(code: string): Promise<boolean> {
-    return this._client.requestAccessToken(code)
+    return this._client
+      .requestAccessToken(code)
       .then((accessToken: string) => {
         return this.fetchCurrentAccount();
       })
@@ -105,7 +120,10 @@ export class Whiteflag {
     return this._client.fetchAccount(id);
   }
 
-  public fetchTimeline(timelineType: MastodonTimelineType, query: object = []): Promise<object> {
+  public fetchTimeline(
+    timelineType: MastodonTimelineType,
+    query: object = []
+  ): Promise<object> {
     return this._client.fetchTimeline(timelineType, query);
   }
 
@@ -133,13 +151,18 @@ export class Whiteflag {
     return this._client.unboostToot(tootId);
   }
 
-  public connectTimeline(type: MastodonStreamType, query: object = {}): WebSocket {
+  public connectTimeline(
+    type: MastodonStreamType,
+    query: object = {}
+  ): WebSocket {
     return this._client.createWebSocketConnection(type, query);
   }
 }
 
-export function convertColumnTypeToStreamType(columnType: WhiteflagColumnType): MastodonStreamType {
-  switch(columnType) {
+export function convertColumnTypeToStreamType(
+  columnType: WhiteflagColumnType
+): MastodonStreamType {
+  switch (columnType) {
     case WhiteflagColumnType.HOME:
       return MastodonStreamType.HOME;
 
@@ -156,11 +179,15 @@ export function convertColumnTypeToStreamType(columnType: WhiteflagColumnType): 
       return MastodonStreamType.TAG_LOCAL;
 
     default:
-      throw new Error(`カラムタイプ${columnType}に該当するストリームタイプがありません。`);
+      throw new Error(
+        `カラムタイプ${columnType}に該当するストリームタイプがありません。`
+      );
   }
 }
-export function convertColumnTypeToTimelineType(columnType: WhiteflagColumnType): MastodonTimelineType {
-  switch(columnType) {
+export function convertColumnTypeToTimelineType(
+  columnType: WhiteflagColumnType
+): MastodonTimelineType {
+  switch (columnType) {
     case WhiteflagColumnType.HOME:
       return MastodonTimelineType.HOME;
 
@@ -183,12 +210,17 @@ export function convertColumnTypeToTimelineType(columnType: WhiteflagColumnType)
       return MastodonTimelineType.TAG;
 
     default:
-      throw new Error(`カラムタイプ${columnType}に該当するタイムラインタイプがありません。`);
+      throw new Error(
+        `カラムタイプ${columnType}に該当するタイムラインタイプがありません。`
+      );
   }
 }
 
-export function convertColumnTypeToTitle(columnType: WhiteflagColumnType, query: any = {}): string {
-  switch(columnType) {
+export function convertColumnTypeToTitle(
+  columnType: WhiteflagColumnType,
+  query: any = {}
+): string {
+  switch (columnType) {
     case WhiteflagColumnType.WHITEFLAG_TOOT:
       return 'Toot';
 
@@ -226,7 +258,9 @@ export function convertColumnTypeToTitle(columnType: WhiteflagColumnType, query:
       return '#旗';
 
     default:
-      throw new Error(`カラムタイプ${columnType}に該当するタイトルがありません。`);
+      throw new Error(
+        `カラムタイプ${columnType}に該当するタイトルがありません。`
+      );
   }
 }
 

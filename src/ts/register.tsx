@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, combineReducers, applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'
-import { Router, Route, Switch } from 'react-router'
-import { routerMiddleware, routerReducer } from 'react-router-redux'
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import { Router, Route, Switch } from 'react-router';
+import { routerMiddleware, routerReducer } from 'react-router-redux';
 import { createHashHistory } from 'history';
 
 import { Register } from './containers/Register';
@@ -27,8 +27,9 @@ ReactDOM.render(
     <Router history={history}>
       <Switch>
         <Route exact path="/" component={Register} />
-        <Route path="/code" component={RegisterCode}/>
+        <Route path="/code" component={RegisterCode} />
       </Switch>
     </Router>
   </Provider>,
-  document.querySelector('#app'));
+  document.querySelector('#app')
+);
