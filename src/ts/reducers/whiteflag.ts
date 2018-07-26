@@ -110,8 +110,11 @@ function filterToots(tootList: MastodonTootStatus[]) {
     for (const emoji of toot.emojis) {
       const pattern = new RegExp(`:${emoji.shortcode}:`, 'g');
       const replace = `<img class="emoji" src="${emoji.url}">`;
-      newToot['content'] = toot.content.replace(pattern, replace);
-      newToot['spoiler_text'] = toot.spoiler_text.replace(pattern, replace);
+      newToot['content'] = newToot['content'].replace(pattern, replace);
+      newToot['spoiler_text'] = newToot['spoiler_text'].replace(
+        pattern,
+        replace
+      );
     }
 
     newTootList.push(newToot as MastodonTootStatus);
