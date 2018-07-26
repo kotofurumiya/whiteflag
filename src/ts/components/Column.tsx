@@ -40,12 +40,14 @@ interface ColumnProps {
 }
 
 export class Column extends React.Component<ColumnProps> {
+  protected _columnMainRef: React.RefObject<HTMLDivElement>;
   protected _tootInputRef: React.RefObject<HTMLTextAreaElement>;
 
   protected _selectorRef: React.RefObject<HTMLSelectElement>;
   protected _addButtonRef: React.RefObject<HTMLButtonElement>;
   protected _columnListRef: React.RefObject<HTMLOListElement>;
 
+  protected _scrollToTopListener: (evt: React.MouseEvent<HTMLElement>) => void;
   protected _addColumnListener: (
     evt: React.MouseEvent<HTMLButtonElement>
   ) => void;
@@ -61,15 +63,28 @@ export class Column extends React.Component<ColumnProps> {
       this.props.onInit();
     }
 
+    this._columnMainRef = React.createRef();
     this._tootInputRef = React.createRef();
 
     this._selectorRef = React.createRef();
     this._addButtonRef = React.createRef();
     this._columnListRef = React.createRef();
 
+    this._scrollToTopListener = this._scrollToTop.bind(this);
     this._addColumnListener = this._addColumn.bind(this);
     this._removeColumnListener = this._removeColumn.bind(this);
     this._changeThemeListener = this._changeTheme.bind(this);
+  }
+
+  protected _scrollToTop(evt: React.MouseEvent<HTMLElement>) {
+    const main = this._columnMainRef.current;
+
+    if(main) {
+      const topToot = main.querySelector('.toot-container:first-child');
+      if(topToot) {
+        topToot.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    }
   }
 
   protected _addColumn(evt: Event) {
@@ -131,7 +146,7 @@ export class Column extends React.Component<ColumnProps> {
     if (this.props.columnType === WhiteflagColumnType.WHITEFLAG_TOOT) {
       return (
         <div className="column toot-column">
-          <div className="toot-column-main">
+          <div className="toot-column-main" ref={this._columnMainRef}>
             <TootInput
               currentToot={this.props.currentToot}
               currentAttachments={this.props.currentAttachments}
@@ -173,10 +188,10 @@ export class Column extends React.Component<ColumnProps> {
 
       return (
         <div className="column">
-          <header className="column-header">
+          <header className="column-header" onClick={this._scrollToTopListener}>
             <h1 className="column-title">Columns</h1>
           </header>
-          <div className="column-main">
+          <div className="column-main" ref={this._columnMainRef}>
             <ol className="column-list" ref={this._columnListRef}>
               <TransitionGroup>{columnListItem}</TransitionGroup>
             </ol>
@@ -205,10 +220,10 @@ export class Column extends React.Component<ColumnProps> {
     if (this.props.columnType === WhiteflagColumnType.WHITEFLAG_PREFERENCES) {
       return (
         <div className="column">
-          <header className="column-header">
+          <header className="column-header" onClick={this._scrollToTopListener}>
             <h1 className="column-title">設定</h1>
           </header>
-          <div className="column-main">
+          <div className="column-main" ref={this._columnMainRef}>
             <div className="preferences-container">
               <div className="preference-item">
                 <h2 className="preference-name">テーマ</h2>
@@ -246,13 +261,13 @@ export class Column extends React.Component<ColumnProps> {
 
     return (
       <div className="column">
-        <header className="column-header">
+        <header className="column-header" onClick={this._scrollToTopListener}>
           <h1 className="column-title">{this.props.title}</h1>
         </header>
         <div className="column-status-indicator" data-status-type={statusType}>
           {status}
         </div>
-        <div className="column-main timeline">
+        <div className="column-main timeline" ref={this._columnMainRef}>
           <TransitionGroup>{toots}</TransitionGroup>
         </div>
       </div>

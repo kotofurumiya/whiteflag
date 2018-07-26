@@ -107,6 +107,7 @@
   font-size: 0.8em;
   font-weight: normal;
   user-select: none;
+  cursor: default;
 }
 
 .column-status-indicator {
