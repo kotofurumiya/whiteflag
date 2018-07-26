@@ -19,6 +19,7 @@ export interface TootInputProps {
 
 interface TootInputState {
   enableContentWarning: boolean;
+  tootable: boolean;
 }
 
 export class TootInput extends React.Component<TootInputProps, TootInputState> {
@@ -60,7 +61,8 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     this._onRightClickListener = this._onRightClick.bind(this);
 
     this.state = {
-      enableContentWarning: false
+      enableContentWarning: false,
+      tootable: true
     };
   }
 
@@ -118,18 +120,12 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
   }
 
   protected _postToot() {
-    const button = this._tootButtonRef.current;
-    const textArea = this._tootInputRef.current;
-    const spoiler = this._spoilerInputRef.current;
-
     if (
-      textArea &&
-      textArea.value &&
-      this.props.currentToot.remainTootLength >= 0
+      this.props.currentToot.status &&
+      this.props.currentToot.remainTootLength >= 0 &&
+      this.state.tootable
     ) {
-      if (button) {
-        button.disabled = true;
-      }
+      this.setState({ tootable: false });
 
       this.props
         .postToot(this.props.currentToot)
@@ -137,14 +133,10 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           this.props.changeCurrentToot(new MastodonTootPost());
           this.props.changeCurrentAttachments([]);
 
-          if (button) {
-            button.disabled = false;
-          }
+          this.setState({ tootable: true });
         })
         .catch((e) => {
-          if (button) {
-            button.disabled = false;
-          }
+          this.setState({ tootable: true });
         });
     }
   }
@@ -229,6 +221,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           <button
             className="toot-button"
             onClick={this._postTootListener}
+            disabled={this.state.tootable}
             ref={this._tootButtonRef}
           >
             トゥート！
