@@ -221,7 +221,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           <button
             className="toot-button"
             onClick={this._postTootListener}
-            disabled={this.state.tootable}
+            disabled={!this.state.tootable}
             ref={this._tootButtonRef}
           >
             トゥート！
