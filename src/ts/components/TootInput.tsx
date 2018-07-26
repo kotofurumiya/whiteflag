@@ -1,5 +1,8 @@
+import { remote } from 'electron';
+
 import * as React from 'react';
 import { MastodonTootStatus, MastodonTootPost, MastodonAttachment, MastodonTootPostParams } from '../lib/stump';
+import Menu = Electron.Menu;
 
 export interface TootInputProps {
   currentToot: MastodonTootPost;
@@ -10,12 +13,11 @@ export interface TootInputProps {
 }
 
 interface TootInputState {
-  remainLength: number;
   enableContentWarning: boolean;
 }
 
 export class TootInput extends React.Component<TootInputProps, TootInputState> {
-  protected _maxLength: number;
+  protected _menu: Menu;
 
   protected _tootInputRef: React.RefObject<HTMLTextAreaElement>;
   protected _spoilerInputRef: React.RefObject<HTMLInputElement>;
@@ -25,12 +27,17 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
   protected _deleteMediaListener: (evt: React.MouseEvent<HTMLElement>) => void;
   protected _onInputListener: (evt: React.KeyboardEvent<any>) => void;
   protected _onKeyDownListener: (evt: React.KeyboardEvent<HTMLElement>) => void;
+  protected _onRightClickListener: (evt: React.MouseEvent<HTMLElement>) => void;
   protected _postTootListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
 
   constructor(props:TootInputProps) {
     super(props);
 
-    this._maxLength = 500;
+    const menu = new remote.Menu();
+    menu.append(new remote.MenuItem({ label: '切り取り', role: 'cut' }));
+    menu.append(new remote.MenuItem({ label: 'コピー', role: 'copy' }));
+    menu.append(new remote.MenuItem({ label: '貼り付け', role: 'paste' }));
+    this._menu = menu;
 
     this._tootInputRef = React.createRef();
     this._spoilerInputRef = React.createRef();
@@ -41,11 +48,16 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     this._postTootListener = this._postToot.bind(this);
     this._onInputListener = this._onInput.bind(this);
     this._onKeyDownListener = this._onKeyDown.bind(this);
+    this._onRightClickListener = this._onRightClick.bind(this);
 
     this.state = {
-      remainLength: this._maxLength,
       enableContentWarning: false
     };
+  }
+
+  protected _onRightClick(evt: React.MouseEvent<HTMLElement>) {
+    evt.preventDefault();
+    this._menu.popup({});
   }
 
   protected _toggleContentWarning(evt: React.MouseEvent<HTMLButtonElement>) {
@@ -97,7 +109,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
     const textArea = this._tootInputRef.current;
     const spoiler = this._spoilerInputRef.current;
 
-    if(textArea && textArea.value && this.state.remainLength >= 0) {
+    if(textArea && textArea.value && this.props.currentToot.remainTootLength >= 0) {
       if(button) {
         button.disabled = true;
       }
@@ -156,6 +168,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           value={this.props.currentToot.spoiler_text}
           onInput={this._onInputListener}
           onKeyDown={this._onKeyDownListener}
+          onContextMenu={this._onRightClickListener}
           ref={this._spoilerInputRef}
         /> : undefined}
         <textarea
@@ -164,6 +177,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           value={this.props.currentToot.status}
           onInput={this._onInputListener}
           onKeyDown={this._onKeyDownListener}
+          onContextMenu={this._onRightClickListener}
           ref={this._tootInputRef}
           required
         />
