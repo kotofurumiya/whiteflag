@@ -10,10 +10,7 @@ import {
 export function* fetchTimeline(action: MastodonFetchTootsAction) {
   try {
     const toots = yield call(() =>
-      action.payload.client.fetchTimeline(
-        action.payload.timelineType,
-        action.payload.query
-      )
+      action.payload.client.fetchTimeline(action.payload.timelineType, action.payload.query)
     );
     yield put(receiveToots(action.payload.columnId, toots));
   } catch (e) {
@@ -31,10 +28,7 @@ function* fetchAccount(action: MastodonFetchAccountAction) {
     if (action.payload.idOrTarget === 'current_user') {
       account = yield call(() => action.payload.client.fetchCurrentAccount());
     } else {
-      account = yield call(
-        (id) => action.payload.client.fetchAccount(id),
-        action.payload.idOrTarget as number
-      );
+      account = yield call((id) => action.payload.client.fetchAccount(id), action.payload.idOrTarget as number);
     }
     yield put(receiveAccount(account));
   } catch (e) {

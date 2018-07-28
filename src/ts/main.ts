@@ -56,10 +56,7 @@ function handleSquirrelEvent() {
 }
 
 let mainWindow: Electron.BrowserWindow | null = null;
-const configJsonPath: string = path.join(
-  app.getPath('userData'),
-  'config.json'
-);
+const configJsonPath: string = path.join(app.getPath('userData'), 'config.json');
 
 interface WindowConfig {
   width: number | undefined;
@@ -75,18 +72,14 @@ function createWindow() {
     : defaultConfig.windowConfig;
 
   // 通信ヘッダにOriginを加える。
-  session.defaultSession!.webRequest.onBeforeSendHeaders(
-    (details: any, callback: any) => {
-      details.requestHeaders['Origin'] = 'electron://whiteflag';
-      callback({ cancel: false, requestHeaders: details.requestHeaders });
-    }
-  );
+  session.defaultSession!.webRequest.onBeforeSendHeaders((details: any, callback: any) => {
+    details.requestHeaders['Origin'] = 'electron://whiteflag';
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
 
   // メニュー。winとmacで振り分け。
   const menuTemplate =
-    process.platform === 'darwin'
-      ? createDarwinMenuTemplate(app.getName())
-      : createWinMenuTemplate();
+    process.platform === 'darwin' ? createDarwinMenuTemplate(app.getName()) : createWinMenuTemplate();
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 

@@ -81,10 +81,7 @@ export function fetchToots(
   };
 }
 
-export function receiveToots(
-  columnId: string,
-  tootList: any[]
-): MastodonReceiveTootsAction {
+export function receiveToots(columnId: string, tootList: any[]): MastodonReceiveTootsAction {
   return {
     type: 'MASTODON_RECEIVE_INITIAL_TOOTS',
     payload: {
@@ -94,9 +91,7 @@ export function receiveToots(
   };
 }
 
-export function receiveFailedToots(
-  message: string
-): MastodonReceiveFailedAction {
+export function receiveFailedToots(message: string): MastodonReceiveFailedAction {
   return {
     type: 'MASTODON_RECEIVE_FAILED_TOOTS',
     payload: {
@@ -106,9 +101,7 @@ export function receiveFailedToots(
   };
 }
 
-export function updateAccountInfoList(
-  accountInfoList: AccountInfo[]
-): MastodonUpdateAccountInfoListAction {
+export function updateAccountInfoList(accountInfoList: AccountInfo[]): MastodonUpdateAccountInfoListAction {
   return {
     type: 'MASTODON_UPDATE_ACCOUNT_INFO_LIST',
     payload: {
@@ -130,9 +123,7 @@ export function fetchAccount(
   };
 }
 
-export function receiveAccount(
-  account: MastodonAccount
-): MastodonReceiveAccountAction {
+export function receiveAccount(account: MastodonAccount): MastodonReceiveAccountAction {
   return {
     type: 'MASTODON_RECEIVE_ACCOUNT',
     payload: {
@@ -141,11 +132,7 @@ export function receiveAccount(
   };
 }
 
-export function receiveEvent(
-  columnId: string,
-  eventType: string,
-  data: object
-): MastodonReceiveEventAction {
+export function receiveEvent(columnId: string, eventType: string, data: object): MastodonReceiveEventAction {
   return {
     type: 'MASTODON_RECEIVE_EVENT',
     payload: {

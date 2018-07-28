@@ -25,21 +25,13 @@ export class Toot extends React.Component<TootProps, TootState> {
   protected _tootContentRef: React.RefObject<HTMLDivElement>;
   protected _spoilerRef: React.RefObject<HTMLDetailsElement>;
 
-  protected _onClickImgListener: (
-    event: React.MouseEvent<HTMLImageElement>
-  ) => any;
-  protected _onClickVideoListener: (
-    event: React.MouseEvent<HTMLVideoElement>
-  ) => any;
+  protected _onClickImgListener: (event: React.MouseEvent<HTMLImageElement>) => any;
+  protected _onClickVideoListener: (event: React.MouseEvent<HTMLVideoElement>) => any;
 
   protected _onClickHashtagListener: (event: Event) => any;
 
-  protected _onClickFavouriteButtonListener: (
-    event: React.MouseEvent<HTMLElement>
-  ) => any;
-  protected _onClickBoostButtonListener: (
-    event: React.MouseEvent<HTMLElement>
-  ) => any;
+  protected _onClickFavouriteButtonListener: (event: React.MouseEvent<HTMLElement>) => any;
+  protected _onClickBoostButtonListener: (event: React.MouseEvent<HTMLElement>) => any;
 
   constructor(props: TootProps) {
     super(props);
@@ -55,17 +47,11 @@ export class Toot extends React.Component<TootProps, TootState> {
 
     this._onClickHashtagListener = this._onClickHashtag.bind(this);
 
-    this._onClickFavouriteButtonListener = this._onClickFavouriteButton.bind(
-      this
-    );
+    this._onClickFavouriteButtonListener = this._onClickFavouriteButton.bind(this);
     this._onClickBoostButtonListener = this._onClickBoostButton.bind(this);
 
-    const reblogged = this.props.toot.reblogged
-      ? this.props.toot.reblogged
-      : false;
-    const favourited = this.props.toot.favourited
-      ? this.props.toot.favourited
-      : false;
+    const reblogged = this.props.toot.reblogged ? this.props.toot.reblogged : false;
+    const favourited = this.props.toot.favourited ? this.props.toot.favourited : false;
     this.state = { reblogged, favourited };
   }
 
@@ -83,9 +69,7 @@ export class Toot extends React.Component<TootProps, TootState> {
   // CWの「もっと見る」ボタンをクリックした時の動作。
   protected _onToggleSpoiler(evt: Event) {
     const detailsElement = evt.target as HTMLDetailsElement;
-    const summaryElement = detailsElement.querySelector(
-      'summary'
-    ) as HTMLSummaryElement;
+    const summaryElement = detailsElement.querySelector('summary') as HTMLSummaryElement;
     summaryElement.innerText = detailsElement.open ? '隠す' : 'もっと見る';
   }
 
@@ -166,70 +150,59 @@ export class Toot extends React.Component<TootProps, TootState> {
       const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
       return `${days}日前`;
     } else {
-      return `${this._timestampDate.getMonth() +
-        1}/${this._timestampDate.getDate()}`;
+      return `${this._timestampDate.getMonth() + 1}/${this._timestampDate.getDate()}`;
     }
   }
 
   render() {
     const sensitiveCover = (
-      <div
-        className="toot-media-attachment-spoiler-warning"
-        onClick={this._onClickSensitiveMedia}
-      >
+      <div className="toot-media-attachment-spoiler-warning" onClick={this._onClickSensitiveMedia}>
         <div>クリックで表示</div>
       </div>
     );
 
-    const mediaList = this.props.toot.media_attachments.map(
-      (media: MastodonAttachment) => {
-        if (media.type === 'video' || media.type === 'gifv') {
-          return (
-            <div key={media.id} className="toot-media-attachment">
-              <video
-                className="toot-media-attachment-content"
-                src={media.url}
-                width="500"
-                height="500"
-                onClick={this._onClickVideoListener}
-                controls={true}
-              >
-                video
-              </video>
-              {this.props.toot.sensitive ? sensitiveCover : null}
-            </div>
-          );
-        } else {
-          return (
-            <div key={media.id} className="toot-media-attachment">
-              <img
-                className="toot-media-attachment-content"
-                src={media.url}
-                width="500"
-                height="500"
-                onClick={this._onClickImgListener}
-              />
-              {this.props.toot.sensitive ? sensitiveCover : null}
-            </div>
-          );
-        }
+    const mediaList = this.props.toot.media_attachments.map((media: MastodonAttachment) => {
+      if (media.type === 'video' || media.type === 'gifv') {
+        return (
+          <div key={media.id} className="toot-media-attachment">
+            <video
+              className="toot-media-attachment-content"
+              src={media.url}
+              width="500"
+              height="500"
+              onClick={this._onClickVideoListener}
+              controls={true}
+            >
+              video
+            </video>
+            {this.props.toot.sensitive ? sensitiveCover : null}
+          </div>
+        );
+      } else {
+        return (
+          <div key={media.id} className="toot-media-attachment">
+            <img
+              className="toot-media-attachment-content"
+              src={media.url}
+              width="500"
+              height="500"
+              onClick={this._onClickImgListener}
+            />
+            {this.props.toot.sensitive ? sensitiveCover : null}
+          </div>
+        );
       }
-    );
+    });
 
     const timestamp = this._generateRelativeTimestamp();
 
-    let tootContent = this.props.toot.spoiler_text
-      ? this.props.toot.spoiler_text
-      : this.props.toot.content;
+    let tootContent = this.props.toot.spoiler_text ? this.props.toot.spoiler_text : this.props.toot.content;
     let spoiler = undefined;
     if (this.props.toot.spoiler_text) {
       spoiler = (
         <details className="spoiler" ref={this._spoilerRef}>
           <summary className="spoiler-summary">もっと見る</summary>
-          <div
-            className="spoiler-content"
-            dangerouslySetInnerHTML={{ __html: this.props.toot.content }}
-          />
+          <div className="spoiler-content" dangerouslySetInnerHTML={{ __html: this.props.toot.content }} />
         </details>
       );
     }
@@ -244,9 +217,7 @@ export class Toot extends React.Component<TootProps, TootState> {
             <div className="toot-info">
               <span className="toot-name">
                 {this.props.toot.account.display_name}
-                <span className="toot-acct">
-                  @{this.props.toot.account.acct}
-                </span>
+                <span className="toot-acct">@{this.props.toot.account.acct}</span>
               </span>
               <span className="toot-timestamp">{timestamp}</span>
             </div>
@@ -260,10 +231,7 @@ export class Toot extends React.Component<TootProps, TootState> {
             <div className="toot-media-attachments-container">{mediaList}</div>
 
             <div className="toot-action-bar">
-              <button
-                className="toot-action-button toot-action-reply"
-                data-toot-id={this.props.toot.id}
-              />
+              <button className="toot-action-button toot-action-reply" data-toot-id={this.props.toot.id} />
               <button
                 className="toot-action-button toot-action-boost"
                 onClick={this._onClickBoostButtonListener}
@@ -286,17 +254,13 @@ export class Toot extends React.Component<TootProps, TootState> {
   componentDidMount() {
     if (this._tootContentRef.current) {
       // ボタンをクリックしたときIDをコピーする。
-      const buttons = Array.from(
-        this._tootContentRef.current.querySelectorAll('.multibattle-button')
-      );
+      const buttons = Array.from(this._tootContentRef.current.querySelectorAll('.multibattle-button'));
       for (const button of buttons) {
         button.addEventListener('click', this._onClickMultibattleButton);
       }
 
       // ハッシュタグクリック時にカラムを変更する。
-      const hashtagAnchorList = Array.from(
-        this._tootContentRef.current.querySelectorAll('.hashtag')
-      );
+      const hashtagAnchorList = Array.from(this._tootContentRef.current.querySelectorAll('.hashtag'));
       for (const anchor of hashtagAnchorList) {
         anchor.addEventListener('click', this._onClickHashtagListener);
       }
@@ -312,17 +276,13 @@ export class Toot extends React.Component<TootProps, TootState> {
   componentWillUnmount() {
     // アンマウント時にイベントリスナを解除する。
     if (this._tootContentRef.current) {
-      const buttons = Array.from(
-        this._tootContentRef.current.querySelectorAll('.multibattle-button')
-      );
+      const buttons = Array.from(this._tootContentRef.current.querySelectorAll('.multibattle-button'));
       for (const button of buttons) {
         button.removeEventListener('click', this._onClickMultibattleButton);
       }
 
       // ハッシュタグクリック時のリスナ。
-      const hashtagAnchorList = Array.from(
-        this._tootContentRef.current.querySelectorAll('.hashtag')
-      );
+      const hashtagAnchorList = Array.from(this._tootContentRef.current.querySelectorAll('.hashtag'));
       for (const anchor of hashtagAnchorList) {
         anchor.removeEventListener('click', this._onClickHashtagListener);
       }

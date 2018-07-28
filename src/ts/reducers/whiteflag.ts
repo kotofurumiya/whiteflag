@@ -7,12 +7,7 @@ import {
   MastodonUpdateAccountInfoListAction
 } from '../actions/mastodon';
 
-import {
-  MastodonAccount,
-  MastodonAttachment,
-  MastodonTootPost,
-  MastodonTootStatus
-} from '../lib/stump';
+import { MastodonAccount, MastodonAttachment, MastodonTootPost, MastodonTootStatus } from '../lib/stump';
 import {
   cloneColumn,
   convertColumnTypeToTitle,
@@ -100,8 +95,7 @@ function filterToots(tootList: MastodonTootStatus[]) {
     if (toot.tags.some((t) => t.name === '切り株')) {
       // <p>DEADBEEF<br /> みたいなIDをボタンに置き換える。
       const pattern = /(\W|<[\w\s/]+>)([0-9a-fA-F]{5,})(\s|<[\w\s/]+>|$)/g;
-      const replace =
-        '$1<button class="button multibattle-button">$2</button>$3';
+      const replace = '$1<button class="button multibattle-button">$2</button>$3';
       newToot['content'] = toot.content.replace(pattern, replace);
       newToot['spoiler_text'] = toot.spoiler_text.replace(pattern, replace);
     }
@@ -111,10 +105,7 @@ function filterToots(tootList: MastodonTootStatus[]) {
       const pattern = new RegExp(`:${emoji.shortcode}:`, 'g');
       const replace = `<img class="emoji" src="${emoji.url}">`;
       newToot['content'] = newToot['content'].replace(pattern, replace);
-      newToot['spoiler_text'] = newToot['spoiler_text'].replace(
-        pattern,
-        replace
-      );
+      newToot['spoiler_text'] = newToot['spoiler_text'].replace(pattern, replace);
     }
 
     newTootList.push(newToot as MastodonTootStatus);
@@ -123,17 +114,10 @@ function filterToots(tootList: MastodonTootStatus[]) {
   return newTootList;
 }
 
-export function whiteflagReducer(
-  state: WhiteflagState = initialWhiteflagState,
-  action: Action
-): WhiteflagState {
+export function whiteflagReducer(state: WhiteflagState = initialWhiteflagState, action: Action): WhiteflagState {
   const mainColumn: WhiteflagColumn = cloneColumn(state.mainColumn);
-  const notificationColumn: WhiteflagColumn = cloneColumn(
-    state.notificationColumn
-  );
-  const columnList: WhiteflagColumn[] = state.columnList.map((c) =>
-    cloneColumn(c)
-  );
+  const notificationColumn: WhiteflagColumn = cloneColumn(state.notificationColumn);
+  const columnList: WhiteflagColumn[] = state.columnList.map((c) => cloneColumn(c));
   const currentToot: MastodonTootPost = state.currentToot;
   const currentAttachments: MastodonAttachment[] = state.currentAttachments;
   const themeName = state.themeName;
@@ -148,8 +132,7 @@ export function whiteflagReducer(
         currentToot,
         currentAttachments,
         tootMode: state.tootMode,
-        currentDate: (action as WhiteflagUpdateCurrentDateAction).payload
-          .currentDate,
+        currentDate: (action as WhiteflagUpdateCurrentDateAction).payload.currentDate,
         themeName
       };
     }
@@ -179,9 +162,7 @@ export function whiteflagReducer(
       const includesTootColumn = [mainColumn, ...columnList].some(
         (col) => col.columnType === WhiteflagColumnType.WHITEFLAG_TOOT
       );
-      const tootMode = includesTootColumn
-        ? WhiteflagTootMode.COLUMN
-        : WhiteflagTootMode.BAR_UNDER;
+      const tootMode = includesTootColumn ? WhiteflagTootMode.COLUMN : WhiteflagTootMode.BAR_UNDER;
 
       return {
         mainColumn,
@@ -200,9 +181,7 @@ export function whiteflagReducer(
       const whiteflagColumnAction = action as WhiteflagColumnAction;
       const columnId = whiteflagColumnAction.payload.columnId;
 
-      const removeIndex = columnList.findIndex(
-        (col) => col.columnId === columnId
-      );
+      const removeIndex = columnList.findIndex((col) => col.columnId === columnId);
 
       const websocket = columnList[removeIndex].stream.webSocket;
       if (websocket) {
@@ -216,9 +195,7 @@ export function whiteflagReducer(
       const includesTootColumn = [mainColumn, ...columnList].some(
         (col) => col.columnType === WhiteflagColumnType.WHITEFLAG_TOOT
       );
-      const tootMode = includesTootColumn
-        ? WhiteflagTootMode.COLUMN
-        : WhiteflagTootMode.BAR_UNDER;
+      const tootMode = includesTootColumn ? WhiteflagTootMode.COLUMN : WhiteflagTootMode.BAR_UNDER;
 
       return {
         mainColumn,
@@ -299,9 +276,7 @@ export function whiteflagReducer(
       const whiteflagColumnAction = action as WhiteflagChangeColumnTypeAction;
 
       const targetColumnId = whiteflagColumnAction.payload.columnId;
-      const targetColumn = [mainColumn, ...columnList].find(
-        (col) => col.columnId === targetColumnId
-      );
+      const targetColumn = [mainColumn, ...columnList].find((col) => col.columnId === targetColumnId);
 
       // 対象カラムが存在しなかったらreturn。
       if (!targetColumn) {
@@ -312,10 +287,7 @@ export function whiteflagReducer(
 
       // カラムタイプとクエリからタイトルを作成する。
       const query = whiteflagColumnAction.payload.query;
-      const title = convertColumnTypeToTitle(
-        whiteflagColumnAction.payload.columnType,
-        query
-      );
+      const title = convertColumnTypeToTitle(whiteflagColumnAction.payload.columnType, query);
 
       // WebSocketは一旦閉じる。
       if (targetColumn.stream.webSocket) {
@@ -325,15 +297,11 @@ export function whiteflagReducer(
       // メインカラムならIDの先頭に'whiteflag:main:'をつける。
       let newColumnId = whiteflagColumnAction.payload.columnId;
       if (isMainColumn) {
-        newColumnId =
-          'whiteflag:main:' + whiteflagColumnAction.payload.columnType;
+        newColumnId = 'whiteflag:main:' + whiteflagColumnAction.payload.columnType;
       }
 
       let prevColumn;
-      if (
-        !targetColumn.prevColumn &&
-        !whiteflagColumnAction.payload.unlinkPreviousColumn
-      ) {
+      if (!targetColumn.prevColumn && !whiteflagColumnAction.payload.unlinkPreviousColumn) {
         prevColumn = cloneColumn(targetColumn);
       }
 
@@ -353,9 +321,7 @@ export function whiteflagReducer(
       };
 
       const newMainColumn = isMainColumn ? newColumn : mainColumn;
-      const newColumnIndex = isMainColumn
-        ? -1
-        : columnList.findIndex((col) => col === targetColumn);
+      const newColumnIndex = isMainColumn ? -1 : columnList.findIndex((col) => col === targetColumn);
       const newColumnList = [...columnList];
 
       // 前のカラムと置き換える。
@@ -367,9 +333,7 @@ export function whiteflagReducer(
       const includesTootColumn = [newMainColumn, ...newColumnList].some(
         (col) => col.columnType === WhiteflagColumnType.WHITEFLAG_TOOT
       );
-      const tootMode = includesTootColumn
-        ? WhiteflagTootMode.COLUMN
-        : WhiteflagTootMode.BAR_UNDER;
+      const tootMode = includesTootColumn ? WhiteflagTootMode.COLUMN : WhiteflagTootMode.BAR_UNDER;
 
       return {
         mainColumn: newMainColumn,
@@ -396,9 +360,7 @@ export function whiteflagReducer(
 
       let newMainColumn = mainColumn;
 
-      const targetColumn = isMainColumn
-        ? state.mainColumn
-        : columnList[columnIndex];
+      const targetColumn = isMainColumn ? state.mainColumn : columnList[columnIndex];
 
       const newColumn = {
         columnId,
@@ -407,9 +369,7 @@ export function whiteflagReducer(
         query: targetColumn.query,
         isInitialized: true,
         stream: targetColumn.stream,
-        tootList: filterToots(
-          (action as MastodonReceiveTootsAction).payload.tootList
-        ),
+        tootList: filterToots((action as MastodonReceiveTootsAction).payload.tootList),
         prevColumn: targetColumn.prevColumn
       };
 
@@ -495,9 +455,7 @@ export function whiteflagReducer(
         case 'delete': {
           const deleteId = data;
           const newTootList = [...targetColumn.tootList];
-          const deleteIndex = newTootList.findIndex(
-            (t) => t.id.toString() === deleteId.toString()
-          );
+          const deleteIndex = newTootList.findIndex((t) => t.id.toString() === deleteId.toString());
 
           if (deleteIndex >= 0) {
             newTootList.splice(deleteIndex, 1);
@@ -598,8 +556,7 @@ export function fetchAccountReducer(
   switch (action.type) {
     case 'MASTODON_UPDATE_ACCOUNT_INFO_LIST': {
       return {
-        accountInfoList: (action as MastodonUpdateAccountInfoListAction).payload
-          .accountInfoList,
+        accountInfoList: (action as MastodonUpdateAccountInfoListAction).payload.accountInfoList,
         currentAccount: state.currentAccount
       };
     }

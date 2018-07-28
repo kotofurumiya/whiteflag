@@ -234,20 +234,14 @@ export class MastodonClient {
   protected _authInfo: MastodonClientAuthInfo | null;
   protected _accountInfo: AccountInfo | null;
 
-  constructor(
-    host: string,
-    authInfo: MastodonClientAuthInfo | null = null,
-    accountInfo: AccountInfo | null = null
-  ) {
+  constructor(host: string, authInfo: MastodonClientAuthInfo | null = null, accountInfo: AccountInfo | null = null) {
     this._host = host;
     this._authInfo = authInfo;
     this._accountInfo = accountInfo;
   }
 
   // APIを叩いてクライアントを登録する。
-  public registerClient(
-    clientInfo: MastodonClientInfo
-  ): Promise<MastodonClientAuthInfo> {
+  public registerClient(clientInfo: MastodonClientInfo): Promise<MastodonClientAuthInfo> {
     // 登録に必要なデータはclient_name, redirect_uris, scopeの3つ。
     // websiteは任意。
     const formData: FormData = new FormData();
@@ -292,8 +286,7 @@ export class MastodonClient {
       throw new Error('クライアントの認証情報がありません。');
     }
 
-    const client_id =
-      'client_id=' + encodeURIComponent(this._authInfo.clientId);
+    const client_id = 'client_id=' + encodeURIComponent(this._authInfo.clientId);
     const response_type = 'response_type=code';
     const redirect_uri = 'redirect_uri=' + encodeURIComponent(redirectUri);
     const scope = 'scope=' + encodeURIComponent(scopeList.join(' '));
@@ -375,9 +368,7 @@ export class MastodonClient {
 
   // 現在のアカウントの情報を取得する。
   public fetchCurrentAccount(): Promise<MastodonAccount> {
-    return this._fetchGetApi(
-      `https://${this._host}/api/v1/accounts/verify_credentials`
-    ).then((json) => {
+    return this._fetchGetApi(`https://${this._host}/api/v1/accounts/verify_credentials`).then((json) => {
       if ('error' in json) {
         throw new Error('Error:' + json.error);
       }
@@ -396,9 +387,7 @@ export class MastodonClient {
   }
 
   public fetchAccount(id: number): Promise<MastodonAccount> {
-    return this._fetchGetApi(
-      `https://${this._host}/api/v1/accounts/${id}`
-    ).then((json) => {
+    return this._fetchGetApi(`https://${this._host}/api/v1/accounts/${id}`).then((json) => {
       if ('error' in json) {
         throw new Error(json.error);
       }
@@ -407,10 +396,7 @@ export class MastodonClient {
     });
   }
 
-  public fetchTimeline(
-    timelineType: MastodonTimelineType,
-    query: object = {}
-  ): Promise<object> {
+  public fetchTimeline(timelineType: MastodonTimelineType, query: object = {}): Promise<object> {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
       params.append(key, value);
@@ -420,23 +406,13 @@ export class MastodonClient {
 
     switch (timelineType) {
       case MastodonTimelineType.HOME:
-        return this._fetchGetApi(
-          `https://${this._host}/api/v1/timelines/home?${paramStr}`
-        );
+        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/home?${paramStr}`);
       case MastodonTimelineType.PUBLIC:
-        return this._fetchGetApi(
-          `https://${this._host}/api/v1/timelines/public?${paramStr}`
-        );
+        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/public?${paramStr}`);
       case MastodonTimelineType.ACCOUNT:
-        return this._fetchGetApi(
-          `https://${this._host}/api/v1/accounts/${
-            query['id']
-          }/statuses?${paramStr}`
-        );
+        return this._fetchGetApi(`https://${this._host}/api/v1/accounts/${query['id']}/statuses?${paramStr}`);
       case MastodonTimelineType.TAG:
-        return this._fetchGetApi(
-          `https://${this._host}/api/v1/timelines/tag/${query['tag']}`
-        );
+        return this._fetchGetApi(`https://${this._host}/api/v1/timelines/tag/${query['tag']}`);
       default:
         throw new Error(`無効なタイムラインタイプ：${timelineType}。`);
     }
@@ -446,15 +422,13 @@ export class MastodonClient {
     const data = new FormData();
     data.append('file', file);
 
-    return this._fetchPostApi(`https://${this._host}/api/v1/media`, data).then(
-      (json) => {
-        if ('error' in json) {
-          throw new Error(json.error);
-        }
-
-        return json;
+    return this._fetchPostApi(`https://${this._host}/api/v1/media`, data).then((json) => {
+      if ('error' in json) {
+        throw new Error(json.error);
       }
-    );
+
+      return json;
+    });
   }
 
   public postToot(toot: MastodonTootPost): Promise<MastodonTootStatus> {
@@ -483,10 +457,7 @@ export class MastodonClient {
       data.append('visibility', toot.visibility);
     }
 
-    return this._fetchPostApi(
-      `https://${this._host}/api/v1/statuses`,
-      data
-    ).then((json) => {
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses`, data).then((json) => {
       if ('error' in json) {
         throw new Error(json.error);
       }
@@ -496,38 +467,23 @@ export class MastodonClient {
   }
 
   public favouriteToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(
-      `https://${this._host}/api/v1/statuses/${id}/favourite`,
-      new FormData()
-    );
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/favourite`, new FormData());
   }
 
   public unfavouriteToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(
-      `https://${this._host}/api/v1/statuses/${id}/unfavourite`,
-      new FormData()
-    );
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unfavourite`, new FormData());
   }
 
   public boostToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(
-      `https://${this._host}/api/v1/statuses/${id}/reblog`,
-      new FormData()
-    );
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/reblog`, new FormData());
   }
 
   public unboostToot(id: string): Promise<MastodonTootStatus> {
-    return this._fetchPostApi(
-      `https://${this._host}/api/v1/statuses/${id}/unreblog`,
-      new FormData()
-    );
+    return this._fetchPostApi(`https://${this._host}/api/v1/statuses/${id}/unreblog`, new FormData());
   }
 
   // typeはpublic, public:local, user, hashtag, hashtag:local
-  public createWebSocketConnection(
-    type: MastodonStreamType,
-    query: object = {}
-  ): WebSocket {
+  public createWebSocketConnection(type: MastodonStreamType, query: object = {}): WebSocket {
     if (!this._accountInfo) {
       throw new Error('アカウントの認証情報がありません。');
     }
@@ -540,11 +496,7 @@ export class MastodonClient {
     const paramStr = params.toString();
 
     const token = this._accountInfo.accessToken;
-    return new WebSocket(
-      `wss://${
-        this._host
-      }/api/v1/streaming?access_token=${token}&stream=${type}&${paramStr}`
-    );
+    return new WebSocket(`wss://${this._host}/api/v1/streaming?access_token=${token}&stream=${type}&${paramStr}`);
   }
 
   public get accountInfo(): AccountInfo | null {

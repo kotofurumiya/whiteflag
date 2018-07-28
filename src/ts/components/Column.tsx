@@ -2,12 +2,7 @@ import * as React from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import { Toot } from './Toot';
-import {
-  MastodonTootStatus,
-  MastodonTootPost,
-  MastodonTootPostParams,
-  MastodonAttachment
-} from '../lib/stump';
+import { MastodonTootStatus, MastodonTootPost, MastodonTootPostParams, MastodonAttachment } from '../lib/stump';
 import { WhiteflagColumn, WhiteflagColumnType } from '../lib/whiteflag';
 import { TootInput } from './TootInput';
 import { ChangeEvent } from 'react';
@@ -32,11 +27,7 @@ interface ColumnProps {
   showMedia: (url: string, type: string) => any;
   addColumn: (type: WhiteflagColumnType, query: any) => any;
   removeColumn: (id: string) => any;
-  changeColumnType: (
-    columnId: string,
-    columnType: WhiteflagColumnType,
-    query?: object
-  ) => any;
+  changeColumnType: (columnId: string, columnType: WhiteflagColumnType, query?: object) => any;
   changeCurrentToot: (toot: MastodonTootPost) => void;
   changeCurrentAttachments: (attachments: MastodonAttachment[]) => void;
   postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
@@ -53,16 +44,9 @@ export class Column extends React.Component<ColumnProps> {
   protected _columnListRef: React.RefObject<HTMLOListElement>;
 
   protected _scrollToTopListener: (evt: React.MouseEvent<HTMLElement>) => void;
-  protected _addColumnListener: (
-    evt: React.MouseEvent<HTMLButtonElement>
-  ) => void;
-  protected _removeColumnListener: (
-    evt: React.MouseEvent<HTMLButtonElement>
-  ) => void;
-  protected _changeColumnTypeListener: (
-    columnType: WhiteflagColumnType,
-    query?: object
-  ) => any;
+  protected _addColumnListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  protected _removeColumnListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  protected _changeColumnTypeListener: (columnType: WhiteflagColumnType, query?: object) => any;
   protected _backPreviousColumnListener: () => any;
   protected _changeThemeListener: (evt: ChangeEvent<HTMLSelectElement>) => void;
 
@@ -119,21 +103,14 @@ export class Column extends React.Component<ColumnProps> {
     }
   }
 
-  protected _changeColumnType(
-    columnType: WhiteflagColumnType,
-    query?: object
-  ): void {
+  protected _changeColumnType(columnType: WhiteflagColumnType, query?: object): void {
     this.props.changeColumnType(this.props.columnId, columnType, query);
   }
 
   protected _backPreviousColumn(): void {
     const prevColumn = this.props.previousColumn;
     if (prevColumn) {
-      this.props.changeColumnType(
-        this.props.columnId,
-        prevColumn.columnType,
-        prevColumn.query
-      );
+      this.props.changeColumnType(this.props.columnId, prevColumn.columnType, prevColumn.query);
     }
   }
 
@@ -150,11 +127,7 @@ export class Column extends React.Component<ColumnProps> {
 
     for (const toot of this.props.tootList) {
       toots.push(
-        <CSSTransition
-          key={toot.id}
-          classNames="toot-transition"
-          timeout={{ enter: 1000, exit: 100 }}
-        >
+        <CSSTransition key={toot.id} classNames="toot-transition" timeout={{ enter: 1000, exit: 100 }}>
           <Toot
             key={toot.id}
             toot={toot}
@@ -224,17 +197,11 @@ export class Column extends React.Component<ColumnProps> {
             </ol>
             <div className="add-column-container">
               <select className="add-column-selector" ref={this._selectorRef}>
-                <option value={WhiteflagColumnType.WHITEFLAG_TOOT}>
-                  トゥート
-                </option>
+                <option value={WhiteflagColumnType.WHITEFLAG_TOOT}>トゥート</option>
                 <option value={WhiteflagColumnType.HOME}>ホーム</option>
-                <option value={WhiteflagColumnType.PUBLIC_LOCAL}>
-                  ローカルタイムライン
-                </option>
+                <option value={WhiteflagColumnType.PUBLIC_LOCAL}>ローカルタイムライン</option>
                 <option value={WhiteflagColumnType.PUBLIC}>連合</option>
-                <option value={WhiteflagColumnType.HASHTAG_STUMP}>
-                  #切り株
-                </option>
+                <option value={WhiteflagColumnType.HASHTAG_STUMP}>#切り株</option>
                 <option value={WhiteflagColumnType.HASHTAG_FLAG}>#旗</option>
               </select>
               <button onClick={this._addColumnListener}>追加</button>
@@ -254,10 +221,7 @@ export class Column extends React.Component<ColumnProps> {
             <div className="preferences-container">
               <div className="preference-item">
                 <h2 className="preference-name">テーマ</h2>
-                <select
-                  value={this.props.themeName}
-                  onChange={this._changeThemeListener}
-                >
+                <select value={this.props.themeName} onChange={this._changeThemeListener}>
                   <option value="whiteflag">whiteflag</option>
                   <option value="blackflag">blackflag</option>
                 </select>
@@ -282,15 +246,11 @@ export class Column extends React.Component<ColumnProps> {
       this.props.status === 'uninitialized' ||
       this.props.status === 'connecting' ||
       this.props.status === 'disconnected';
-    const status =
-      supportStreaming && isConnecting ? '接続を試みています……' : '';
+    const status = supportStreaming && isConnecting ? '接続を試みています……' : '';
     const statusType = status ? 'error' : 'ok';
 
     const backButton = this.props.previousColumn ? (
-      <button
-        className="column-back-button"
-        onClick={this._backPreviousColumnListener}
-      >
+      <button className="column-back-button" onClick={this._backPreviousColumnListener}>
         &lt;
       </button>
     ) : (

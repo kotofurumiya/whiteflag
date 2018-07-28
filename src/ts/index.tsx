@@ -8,10 +8,7 @@ import createSagaMiddleware from 'redux-saga';
 
 import { App } from './containers/App';
 import { fetchAccountReducer, whiteflagReducer } from './reducers/whiteflag';
-import {
-  MastodonFetchTimelineSaga,
-  MastodonFetchAccountSaga
-} from './sagas/mastodon';
+import { MastodonFetchTimelineSaga, MastodonFetchAccountSaga } from './sagas/mastodon';
 import { createHashHistory } from 'history';
 import { WhiteflagConnectStreamSaga } from './sagas/whiteflag';
 

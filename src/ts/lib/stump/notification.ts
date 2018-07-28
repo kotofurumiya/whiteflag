@@ -27,10 +27,7 @@ export class MastodonUserNotification {
     }
 
     if (notificationData.status) {
-      body = notificationData.status.content.replace(
-        /<("[^"]*"|'[^']*'|[^'">])*>/g,
-        ''
-      );
+      body = notificationData.status.content.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g, '');
     }
 
     const notification = new Notification(title, {

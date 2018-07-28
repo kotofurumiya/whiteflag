@@ -81,9 +81,7 @@ export interface WhiteflagChangeThemeAction extends Action {
   };
 }
 
-export function updateCurrentDate(
-  currentDate: Date
-): WhiteflagUpdateCurrentDateAction {
+export function updateCurrentDate(currentDate: Date): WhiteflagUpdateCurrentDateAction {
   return {
     type: 'WHITEFLAG_UPDATE_CURRENT_DATE',
     payload: {
@@ -168,9 +166,7 @@ export function changeConnectionState(
   };
 }
 
-export function changeCurrentToot(
-  toot: MastodonTootPost
-): WhiteflagChangeCurrentTootAction {
+export function changeCurrentToot(toot: MastodonTootPost): WhiteflagChangeCurrentTootAction {
   return {
     type: 'WHITEFLAG_CHANGE_CURRENT_TOOT',
     payload: {
@@ -179,9 +175,7 @@ export function changeCurrentToot(
   };
 }
 
-export function changeCurrentAttachments(
-  attachments: MastodonAttachment[]
-): WhiteflagChangeCurrentAttachmentsAction {
+export function changeCurrentAttachments(attachments: MastodonAttachment[]): WhiteflagChangeCurrentAttachmentsAction {
   return {
     type: 'WHITEFLAG_CHANGE_CURRENT_ATTACHMENTS',
     payload: {

@@ -27,11 +27,7 @@ export class AuthStorage {
   public addAuth(auth: AuthInfo) {
     const map = this.getAuthMap();
 
-    const authIsValid =
-      'host' in auth &&
-      'id' in auth &&
-      'clientId' in auth &&
-      'clientSecret' in auth;
+    const authIsValid = 'host' in auth && 'id' in auth && 'clientId' in auth && 'clientSecret' in auth;
     if (!authIsValid) {
       return false;
     }

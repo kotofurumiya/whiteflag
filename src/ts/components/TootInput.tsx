@@ -1,12 +1,7 @@
 import { remote } from 'electron';
 
 import * as React from 'react';
-import {
-  MastodonTootStatus,
-  MastodonTootPost,
-  MastodonAttachment,
-  MastodonTootPostParams
-} from '../lib/stump';
+import { MastodonTootStatus, MastodonTootPost, MastodonAttachment, MastodonTootPostParams } from '../lib/stump';
 import Menu = Electron.Menu;
 
 export interface TootInputProps {
@@ -29,16 +24,12 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
   protected _spoilerInputRef: React.RefObject<HTMLInputElement>;
   protected _tootButtonRef: React.RefObject<HTMLButtonElement>;
 
-  protected _toggleContentWarningListener: (
-    evt: React.MouseEvent<HTMLButtonElement>
-  ) => void;
+  protected _toggleContentWarningListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
   protected _deleteMediaListener: (evt: React.MouseEvent<HTMLElement>) => void;
   protected _onInputListener: (evt: React.KeyboardEvent<any>) => void;
   protected _onKeyDownListener: (evt: React.KeyboardEvent<HTMLElement>) => void;
   protected _onRightClickListener: (evt: React.MouseEvent<HTMLElement>) => void;
-  protected _postTootListener: (
-    evt: React.MouseEvent<HTMLButtonElement>
-  ) => void;
+  protected _postTootListener: (evt: React.MouseEvent<HTMLButtonElement>) => void;
 
   constructor(props: TootInputProps) {
     super(props);
@@ -91,9 +82,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
       }
     }
 
-    this.props.changeCurrentToot(
-      this.props.currentToot.replace(tootChangeParams)
-    );
+    this.props.changeCurrentToot(this.props.currentToot.replace(tootChangeParams));
   }
 
   protected _onKeyDown(evt: React.KeyboardEvent<HTMLElement>) {
@@ -113,18 +102,12 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
       const media_ids = attachments.map((a) => a.id);
 
       this.props.changeCurrentAttachments(attachments);
-      this.props.changeCurrentToot(
-        this.props.currentToot.replace({ media_ids })
-      );
+      this.props.changeCurrentToot(this.props.currentToot.replace({ media_ids }));
     }
   }
 
   protected _postToot() {
-    if (
-      this.props.currentToot.status &&
-      this.props.currentToot.remainTootLength >= 0 &&
-      this.state.tootable
-    ) {
+    if (this.props.currentToot.status && this.props.currentToot.remainTootLength >= 0 && this.state.tootable) {
       this.setState({ tootable: false });
 
       this.props
@@ -146,10 +129,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
       if (attachment.type === 'image' || attachment.type === 'gifv') {
         return (
           <div key={attachment.id} className="toot-input-attachment-item">
-            <img
-              className="toot-input-attachment-media"
-              src={attachment.preview_url}
-            />
+            <img className="toot-input-attachment-media" src={attachment.preview_url} />
             <div
               className="toot-input-attachment-delete-button"
               onClick={this._deleteMediaListener}
@@ -162,10 +142,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
       } else {
         return (
           <div key={attachment.id} className="toot-input-attachment-item">
-            <video
-              className="toot-input-attachment-media"
-              src={attachment.preview_url}
-            />
+            <video className="toot-input-attachment-media" src={attachment.preview_url} />
             <div
               className="toot-input-attachment-delete-button"
               onClick={this._deleteMediaListener}
@@ -212,9 +189,7 @@ export class TootInput extends React.Component<TootInputProps, TootInputState> {
           >
             CW
           </button>
-          <div className="toot-count">
-            {this.props.currentToot.remainTootLength}
-          </div>
+          <div className="toot-count">{this.props.currentToot.remainTootLength}</div>
         </div>
 
         <div className="toot-button-container">

@@ -35,9 +35,7 @@ class _Register extends React.Component<RegisterProps, {}> {
   // 接続ボタンを押した時にクライアントを登録していけなれば登録する。
   // クライアントの登録が済んだらアカウント認証を行うためのウィンドウをブラウザで開く
   protected _register(evt: React.MouseEvent<HTMLElement>) {
-    const button = document.querySelector(
-      '.register-button'
-    ) as HTMLButtonElement;
+    const button = document.querySelector('.register-button') as HTMLButtonElement;
     button.innerText = '接続中……';
     button.disabled = true;
 
@@ -47,9 +45,7 @@ class _Register extends React.Component<RegisterProps, {}> {
     this.props.dispatch(setHost(host));
     const whiteflag = new Whiteflag(host);
 
-    const registration = whiteflag.isRegistered
-      ? Promise.resolve(true)
-      : whiteflag.registerClient();
+    const registration = whiteflag.isRegistered ? Promise.resolve(true) : whiteflag.registerClient();
     registration
       .then((success: boolean) => {
         if (success) {
@@ -87,10 +83,7 @@ class _Register extends React.Component<RegisterProps, {}> {
           /
         </div>
         <div className="page-content">
-          <button
-            className="register-button"
-            onClick={this._register.bind(this)}
-          >
+          <button className="register-button" onClick={this._register.bind(this)}>
             接続する
           </button>
           <a className="button cancel-button" href="index.html">

@@ -31,17 +31,12 @@ export function createWinMenuTemplate(): Electron.MenuItemConstructorOptions[] {
     {
       label: 'ウィンドウ',
       role: 'window',
-      submenu: [
-        { label: '最小化', role: 'minimize' },
-        { label: '閉じる', role: 'close' }
-      ]
+      submenu: [{ label: '最小化', role: 'minimize' }, { label: '閉じる', role: 'close' }]
     }
   ];
 }
 
-export function createDarwinMenuTemplate(
-  appName: string
-): Electron.MenuItemConstructorOptions[] {
+export function createDarwinMenuTemplate(appName: string): Electron.MenuItemConstructorOptions[] {
   return [
     {
       label: appName,
