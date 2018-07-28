@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { MastodonTootStatus, MastodonAttachment } from '../lib/stump';
+import { WhiteflagColumnType } from '../lib/whiteflag';
 
 export interface TootProps {
   toot: MastodonTootStatus;
@@ -9,6 +10,7 @@ export interface TootProps {
   boost: (tootId: string) => Promise<MastodonTootStatus>;
   unboost: (tootId: string) => Promise<MastodonTootStatus>;
   showMedia: (url: string, type: string) => any;
+  changeColumnType: (columnType: WhiteflagColumnType, query?: object) => any;
 }
 
 interface TootState {
@@ -30,6 +32,8 @@ export class Toot extends React.Component<TootProps, TootState> {
     event: React.MouseEvent<HTMLVideoElement>
   ) => any;
 
+  protected _onClickHashtagListener: (event: Event) => any;
+
   protected _onClickFavouriteButtonListener: (
     event: React.MouseEvent<HTMLElement>
   ) => any;
@@ -48,6 +52,8 @@ export class Toot extends React.Component<TootProps, TootState> {
 
     this._onClickImgListener = this._onClickImg.bind(this);
     this._onClickVideoListener = this._onClickVideo.bind(this);
+
+    this._onClickHashtagListener = this._onClickHashtag.bind(this);
 
     this._onClickFavouriteButtonListener = this._onClickFavouriteButton.bind(
       this
@@ -81,6 +87,24 @@ export class Toot extends React.Component<TootProps, TootState> {
       'summary'
     ) as HTMLSummaryElement;
     summaryElement.innerText = detailsElement.open ? '隠す' : 'もっと見る';
+  }
+
+  protected _onClickHashtag(evt: Event) {
+    evt.preventDefault();
+
+    const anchor = evt.currentTarget as HTMLAnchorElement;
+    const [, , , encodedTag] = anchor.href.split(/\/+/); // '/'や'//'で区切って最後だけ取り出す。
+    const tag = decodeURIComponent(encodedTag);
+
+    let type = WhiteflagColumnType.HASHTAG;
+
+    if (tag === '切り株') {
+      type = WhiteflagColumnType.HASHTAG_STUMP;
+    } else if (tag === '旗') {
+      type = WhiteflagColumnType.HASHTAG_FLAG;
+    }
+
+    this.props.changeColumnType(type, { tag });
   }
 
   protected _onClickSensitiveMedia(evt: React.MouseEvent<any>) {
@@ -260,13 +284,21 @@ export class Toot extends React.Component<TootProps, TootState> {
   }
 
   componentDidMount() {
-    // ボタンをクリックしたときIDをコピーする。
     if (this._tootContentRef.current) {
+      // ボタンをクリックしたときIDをコピーする。
       const buttons = Array.from(
         this._tootContentRef.current.querySelectorAll('.multibattle-button')
       );
       for (const button of buttons) {
         button.addEventListener('click', this._onClickMultibattleButton);
+      }
+
+      // ハッシュタグクリック時にカラムを変更する。
+      const hashtagAnchorList = Array.from(
+        this._tootContentRef.current.querySelectorAll('.hashtag')
+      );
+      for (const anchor of hashtagAnchorList) {
+        anchor.addEventListener('click', this._onClickHashtagListener);
       }
     }
 
@@ -286,12 +318,26 @@ export class Toot extends React.Component<TootProps, TootState> {
       for (const button of buttons) {
         button.removeEventListener('click', this._onClickMultibattleButton);
       }
+
+      // ハッシュタグクリック時のリスナ。
+      const hashtagAnchorList = Array.from(
+        this._tootContentRef.current.querySelectorAll('.hashtag')
+      );
+      for (const anchor of hashtagAnchorList) {
+        anchor.removeEventListener('click', this._onClickHashtagListener);
+      }
     }
 
     // CWのトグル時リスナー。
     if (this._spoilerRef.current) {
       const spoiler = this._spoilerRef.current;
       spoiler.removeEventListener('toggle', this._onToggleSpoiler);
+    }
+
+    // ハッシュタグクリック時のリスナー。
+    const hashtagAnchorList = Array.from(document.querySelectorAll('.hashtag'));
+    for (const anchor of hashtagAnchorList) {
+      anchor.removeEventListener('click', this._onClickHashtagListener);
     }
   }
 }

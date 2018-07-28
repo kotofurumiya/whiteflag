@@ -94,6 +94,7 @@
 }
 
 .column-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +102,16 @@
   color: var(--column-header-text-color);
   border-bottom: 1px solid var(--column-border-color);
   height: 40px;
+}
+
+.column-back-button {
+  position: absolute;
+  display: block;
+  background-color: transparent;
+  color: var(--column-header-text-color);
+  left: 0;
+  height: 100%;
+  padding: 0 1em;
 }
 
 .column-title {

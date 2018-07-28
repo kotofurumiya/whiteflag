@@ -6,9 +6,11 @@ interface SidebarProps {
   readonly mainColumn: WhiteflagColumn;
   readonly currentAccount: MastodonAccount | null;
   readonly selectedColumnType: WhiteflagColumnType;
-  readonly changeMainColumnType: (
+  readonly changeColumnType: (
+    columnId: string,
     type: WhiteflagColumnType,
-    query?: any
+    query?: any,
+    unlinkPreviousColumn?: boolean
   ) => any;
 }
 
@@ -41,7 +43,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.WHITEFLAG_TOOT)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.WHITEFLAG_TOOT,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.WHITEFLAG_TOOT
@@ -53,7 +60,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.HOME)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.HOME,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.HOME
@@ -65,7 +77,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.PUBLIC_LOCAL)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.PUBLIC_LOCAL,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.PUBLIC_LOCAL
@@ -77,7 +94,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.PUBLIC)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.PUBLIC,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.PUBLIC
@@ -89,9 +111,11 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
               WhiteflagColumnType.CURRENT_ACCOUNT,
-              currentAccountQuery
+              currentAccountQuery,
+              true
             )
           }
           data-selected={
@@ -105,7 +129,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.HASHTAG_STUMP)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.HASHTAG_STUMP,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.HASHTAG_STUMP
@@ -117,7 +146,12 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(WhiteflagColumnType.HASHTAG_FLAG)
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.HASHTAG_FLAG,
+              {},
+              true
+            )
           }
           data-selected={
             this.props.selectedColumnType === WhiteflagColumnType.HASHTAG_FLAG
@@ -129,8 +163,11 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(
-              WhiteflagColumnType.WHITEFLAG_COLUMN
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.WHITEFLAG_COLUMN,
+              {},
+              true
             )
           }
           data-selected={
@@ -144,8 +181,11 @@ export class Sidebar extends React.Component<SidebarProps> {
         <div
           className="sidebar-item"
           onClick={() =>
-            this.props.changeMainColumnType(
-              WhiteflagColumnType.WHITEFLAG_PREFERENCES
+            this.props.changeColumnType(
+              this.props.mainColumn.columnId,
+              WhiteflagColumnType.WHITEFLAG_PREFERENCES,
+              {},
+              true
             )
           }
           data-selected={

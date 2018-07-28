@@ -21,9 +21,9 @@ import {
   WhiteflagTootMode
 } from '../lib/whiteflag';
 import {
+  WhiteflagChangeColumnTypeAction,
   WhiteflagChangeCurrentAttachmentsAction,
   WhiteflagChangeCurrentTootAction,
-  WhiteflagChangeMainColumnAction,
   WhiteflagChangeThemeAction,
   WhiteflagColumnAction,
   WhiteflagColumnAddAction,
@@ -268,7 +268,8 @@ export function whiteflagReducer(
           query: targetColumn.stream.query,
           state: whiteflagAction.payload.state
         },
-        tootList: targetColumn.tootList
+        tootList: targetColumn.tootList,
+        prevColumn: targetColumn.prevColumn
       };
 
       if (isMainColumn) {
@@ -293,30 +294,52 @@ export function whiteflagReducer(
       };
     }
 
-    // メインカラムの種類変更。
-    case 'WHITEFLAG_CHANGE_MAIN_COLUMN': {
-      const whiteflagMainColumnAction = action as WhiteflagChangeMainColumnAction;
+    // カラムの種類変更。
+    case 'WHITEFLAG_CHANGE_COLUMN_TYPE': {
+      const whiteflagColumnAction = action as WhiteflagChangeColumnTypeAction;
 
-      const query = whiteflagMainColumnAction.payload.query;
-      const title = convertColumnTypeToTitle(
-        whiteflagMainColumnAction.payload.columnType,
-        query
+      const targetColumnId = whiteflagColumnAction.payload.columnId;
+      const targetColumn = [mainColumn, ...columnList].find(
+        (col) => col.columnId === targetColumnId
       );
 
-      if (
-        mainColumn.columnType === whiteflagMainColumnAction.payload.columnType
-      ) {
+      // 対象カラムが存在しなかったらreturn。
+      if (!targetColumn) {
         return state;
       }
 
-      if (mainColumn.stream.webSocket) {
-        mainColumn.stream.webSocket.close();
+      const isMainColumn = targetColumn.columnId.includes('whiteflag:main:');
+
+      // カラムタイプとクエリからタイトルを作成する。
+      const query = whiteflagColumnAction.payload.query;
+      const title = convertColumnTypeToTitle(
+        whiteflagColumnAction.payload.columnType,
+        query
+      );
+
+      // WebSocketは一旦閉じる。
+      if (targetColumn.stream.webSocket) {
+        targetColumn.stream.webSocket.close(4000); // 4000: paused
       }
 
-      const newMainColumn: WhiteflagColumn = {
-        columnId:
-          'whiteflag:main:' + whiteflagMainColumnAction.payload.columnType,
-        columnType: whiteflagMainColumnAction.payload.columnType,
+      // メインカラムならIDの先頭に'whiteflag:main:'をつける。
+      let newColumnId = whiteflagColumnAction.payload.columnId;
+      if (isMainColumn) {
+        newColumnId =
+          'whiteflag:main:' + whiteflagColumnAction.payload.columnType;
+      }
+
+      let prevColumn;
+      if (
+        !targetColumn.prevColumn &&
+        !whiteflagColumnAction.payload.unlinkPreviousColumn
+      ) {
+        prevColumn = cloneColumn(targetColumn);
+      }
+
+      const newColumn: WhiteflagColumn = {
+        columnId: newColumnId,
+        columnType: whiteflagColumnAction.payload.columnType,
         title,
         query,
         isInitialized: false,
@@ -325,10 +348,23 @@ export function whiteflagReducer(
           query,
           state: 'uninitialized'
         },
-        tootList: []
+        tootList: [],
+        prevColumn
       };
 
-      const includesTootColumn = [newMainColumn, ...columnList].some(
+      const newMainColumn = isMainColumn ? newColumn : mainColumn;
+      const newColumnIndex = isMainColumn
+        ? -1
+        : columnList.findIndex((col) => col === targetColumn);
+      const newColumnList = [...columnList];
+
+      // 前のカラムと置き換える。
+      if (newColumnIndex >= 0) {
+        newColumnList.splice(newColumnIndex, 1, newColumn);
+      }
+
+      // トゥートカラムが存在しなければトゥートバーを表示する。
+      const includesTootColumn = [newMainColumn, ...newColumnList].some(
         (col) => col.columnType === WhiteflagColumnType.WHITEFLAG_TOOT
       );
       const tootMode = includesTootColumn
@@ -338,7 +374,7 @@ export function whiteflagReducer(
       return {
         mainColumn: newMainColumn,
         notificationColumn,
-        columnList: state.columnList,
+        columnList: newColumnList,
         currentToot,
         currentAttachments,
         tootMode,
@@ -373,7 +409,8 @@ export function whiteflagReducer(
         stream: targetColumn.stream,
         tootList: filterToots(
           (action as MastodonReceiveTootsAction).payload.tootList
-        )
+        ),
+        prevColumn: targetColumn.prevColumn
       };
 
       if (isMainColumn) {
@@ -427,7 +464,8 @@ export function whiteflagReducer(
             query: targetColumn.query,
             isInitialized: targetColumn.isInitialized,
             stream: targetColumn.stream,
-            tootList: newTootList.slice(0, 10000)
+            tootList: newTootList.slice(0, 10000),
+            prevColumn: targetColumn.prevColumn
           };
 
           if (isMainColumn) {
@@ -472,7 +510,8 @@ export function whiteflagReducer(
             query: targetColumn.query,
             isInitialized: targetColumn.isInitialized,
             stream: targetColumn.stream,
-            tootList: newTootList
+            tootList: newTootList,
+            prevColumn: targetColumn.prevColumn
           };
 
           if (isMainColumn) {

@@ -35,7 +35,7 @@ import {
 import {
   addColumn,
   changeConnectionState,
-  changeMainColumn,
+  changeColumnType,
   connectColumnToStream,
   removeColumn,
   updateCurrentDate,
@@ -55,7 +55,12 @@ interface AppProps {
   readonly currentAccount: MastodonAccount;
   readonly tootMode: WhiteflagTootMode;
   readonly themeName: string;
-  readonly changeMainColumnType: (type: WhiteflagColumnType, query: any) => any;
+  readonly changeColumnType: (
+    columnId: string,
+    type: WhiteflagColumnType,
+    query: any,
+    unlinkPreviousColumn?: boolean
+  ) => any;
   readonly dispatch: Redux.Dispatch;
 }
 
@@ -81,9 +86,11 @@ class _App extends React.Component<AppProps> {
 
   protected _addColumnBound: (type: WhiteflagColumnType, query: any) => any;
   protected _removeColumnBound: (columnId: string) => any;
-  protected _changeMainColumnTypeBound: (
+  protected _changeColumnTypeBound: (
+    columnId: string,
     columnType: WhiteflagColumnType,
-    query: any
+    query: any,
+    unlinkPreviousColumn?: boolean
   ) => void;
   protected _changeCurrentTootBound: (toot: MastodonTootPost) => void;
   protected _changeCurrentAttachmentsBound: (
@@ -121,7 +128,7 @@ class _App extends React.Component<AppProps> {
 
     this._addColumnBound = this._addColumn.bind(this);
     this._removeColumnBound = this._removeColumn.bind(this);
-    this._changeMainColumnTypeBound = this._changeMainColumnType.bind(this);
+    this._changeColumnTypeBound = this._changeColumnType.bind(this);
     this._changeCurrentTootBound = this._changeCurrentToot.bind(this);
     this._changeCurrentAttachmentsBound = this._changeCurrentAttachments.bind(
       this
@@ -167,7 +174,12 @@ class _App extends React.Component<AppProps> {
       const subColumns = columns.subColumns as any[];
 
       this.props.columnList.forEach((col) => this._removeColumn(col.columnId));
-      this.props.changeMainColumnType(mainColumn.type, mainColumn.query);
+      this.props.changeColumnType(
+        this.props.mainColumn.columnId,
+        mainColumn.type,
+        mainColumn.query,
+        true
+      );
       subColumns.forEach((col) => this._addColumn(col.type, col.query));
     } else {
       this._addColumn(WhiteflagColumnType.PUBLIC_LOCAL, { local: true });
@@ -273,11 +285,18 @@ class _App extends React.Component<AppProps> {
     evt.preventDefault();
   }
 
-  protected _changeMainColumnType(
+  protected _changeColumnType(
+    columnId: string,
     columnType: WhiteflagColumnType,
-    query: any = {}
+    query: any = {},
+    unlinkPreviousColumn: boolean = false
   ) {
-    this.props.changeMainColumnType(columnType, query);
+    this.props.changeColumnType(
+      columnId,
+      columnType,
+      query,
+      unlinkPreviousColumn
+    );
   }
 
   protected _addColumn(columnType: WhiteflagColumnType, query: any = {}) {
@@ -360,26 +379,21 @@ class _App extends React.Component<AppProps> {
         const isNotWhiteflagColumn = !column.columnType.startsWith(
           'whiteflag:'
         );
-        const supportsStreaming =
-          column.columnType !== WhiteflagColumnType.ACCOUNT &&
-          column.columnType !== WhiteflagColumnType.CURRENT_ACCOUNT;
         const needsConnect =
           column.stream.state === 'uninitialized' ||
           column.stream.state === 'disconnected';
 
         // Whiteflag独自カラムではない（タイムライン表示カラムである）かつ
-        // ストリーミングに対応しているかつ
         // コネクションを張る必要がある時は、ストリームにつなぎに行く。
-        if (isNotWhiteflagColumn && supportsStreaming && needsConnect) {
+        if (isNotWhiteflagColumn && needsConnect) {
           this.props.dispatch(
             changeConnectionState(column.columnId, null, 'connecting')
           );
-          const streamType = convertColumnTypeToStreamType(column.columnType);
           this.props.dispatch(
             connectColumnToStream(
               this._whiteflag,
               column.columnId,
-              streamType,
+              column.columnType,
               column.stream.query
             )
           );
@@ -441,25 +455,6 @@ class _App extends React.Component<AppProps> {
     if (accountList.length > 0) {
       const columns = [this.props.mainColumn, ...this.props.columnList].map(
         (cData) => {
-          let onInit;
-
-          if (cData.columnType.startsWith('whiteflag:')) {
-            onInit = () => {};
-          } else {
-            const timelineType = convertColumnTypeToTimelineType(
-              cData.columnType
-            );
-            onInit = () =>
-              this.props.dispatch(
-                fetchToots(
-                  this._whiteflag!,
-                  cData.columnId,
-                  timelineType,
-                  cData.query
-                )
-              );
-          }
-
           return (
             <Column
               key={cData.columnId}
@@ -468,6 +463,7 @@ class _App extends React.Component<AppProps> {
               columnType={cData.columnType}
               query={cData.query}
               tootList={cData.tootList}
+              previousColumn={cData.prevColumn}
               currentToot={this.props.currentToot}
               currentAttachments={this.props.currentAttachments}
               currentDate={this.props.currentDate}
@@ -476,6 +472,7 @@ class _App extends React.Component<AppProps> {
               showMedia={this._showMediaBound}
               addColumn={this._addColumnBound}
               removeColumn={this._removeColumnBound}
+              changeColumnType={this._changeColumnTypeBound}
               changeCurrentToot={this._changeCurrentTootBound}
               changeCurrentAttachments={this._changeCurrentAttachmentsBound}
               postToot={this._postTootBound}
@@ -485,7 +482,6 @@ class _App extends React.Component<AppProps> {
               unboost={this._unboostTootBound}
               changeTheme={this._changeThemeBound}
               columnList={this.props.columnList}
-              onInit={onInit}
             />
           );
         }
@@ -497,7 +493,7 @@ class _App extends React.Component<AppProps> {
             mainColumn={this.props.mainColumn}
             currentAccount={this.props.currentAccount}
             selectedColumnType={this.props.mainColumn.columnType}
-            changeMainColumnType={this._changeMainColumnTypeBound}
+            changeColumnType={this._changeColumnTypeBound}
           />
 
           <main className="main-container">
@@ -569,7 +565,12 @@ function mapStateToProps(state: AppState): object {
 
 function mapDispatchToProps(dispatch: Redux.Dispatch): object {
   return {
-    changeMainColumnType: (type: WhiteflagColumnType, query: any = {}) => {
+    changeColumnType: (
+      columnId: string,
+      type: WhiteflagColumnType,
+      query: any = {},
+      unlinkPreviousColumn: boolean = false
+    ) => {
       if (type === WhiteflagColumnType.PUBLIC_LOCAL) {
         query['local'] = true;
       } else if (type === WhiteflagColumnType.HASHTAG_STUMP) {
@@ -578,7 +579,7 @@ function mapDispatchToProps(dispatch: Redux.Dispatch): object {
         query['tag'] = '旗';
       }
 
-      dispatch(changeMainColumn(type, query));
+      dispatch(changeColumnType(columnId, type, query, unlinkPreviousColumn));
     },
 
     dispatch

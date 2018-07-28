@@ -7,7 +7,7 @@ import {
   receiveAccount
 } from '../actions/mastodon';
 
-function* fetchTimeline(action: MastodonFetchTootsAction) {
+export function* fetchTimeline(action: MastodonFetchTootsAction) {
   try {
     const toots = yield call(() =>
       action.payload.client.fetchTimeline(

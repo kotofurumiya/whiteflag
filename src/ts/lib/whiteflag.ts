@@ -24,6 +24,7 @@ export enum WhiteflagColumnType {
   PUBLIC_LOCAL = 'public:local',
   ACCOUNT = 'account',
   CURRENT_ACCOUNT = 'account:current',
+  HASHTAG = 'hashtag',
   HASHTAG_STUMP = 'hashtag:local:stump',
   HASHTAG_FLAG = 'hashtag:local:flag'
 }
@@ -40,6 +41,7 @@ export interface WhiteflagColumn {
     readonly state: string;
   };
   readonly tootList: MastodonTootStatus[];
+  readonly prevColumn?: WhiteflagColumn;
 }
 
 export enum WhiteflagTootMode {
@@ -172,6 +174,9 @@ export function convertColumnTypeToStreamType(
     case WhiteflagColumnType.PUBLIC_LOCAL:
       return MastodonStreamType.PUBLIC_LOCAL;
 
+    case WhiteflagColumnType.HASHTAG:
+      return MastodonStreamType.TAG_LOCAL;
+
     case WhiteflagColumnType.HASHTAG_STUMP:
       return MastodonStreamType.TAG_LOCAL;
 
@@ -202,6 +207,9 @@ export function convertColumnTypeToTimelineType(
 
     case WhiteflagColumnType.CURRENT_ACCOUNT:
       return MastodonTimelineType.ACCOUNT;
+
+    case WhiteflagColumnType.HASHTAG:
+      return MastodonTimelineType.TAG;
 
     case WhiteflagColumnType.HASHTAG_STUMP:
       return MastodonTimelineType.TAG;
@@ -251,6 +259,10 @@ export function convertColumnTypeToTitle(
       return `${displayName}@${acct}`;
     }
 
+    case WhiteflagColumnType.HASHTAG: {
+      return `#${query.tag}`;
+    }
+
     case WhiteflagColumnType.HASHTAG_STUMP:
       return '#切り株';
 
@@ -276,6 +288,7 @@ export function cloneColumn(column: WhiteflagColumn): WhiteflagColumn {
       query: column.stream.query,
       state: column.stream.state
     },
-    tootList: [...column.tootList] // tootはimmutableなのでディープコピー不要。
+    tootList: [...column.tootList], // tootはimmutableなのでディープコピー不要。
+    prevColumn: column.prevColumn
   };
 }

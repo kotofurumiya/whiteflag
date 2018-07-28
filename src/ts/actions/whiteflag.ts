@@ -14,11 +14,13 @@ export interface WhiteflagUpdateCurrentDateAction extends Action {
   };
 }
 
-export interface WhiteflagChangeMainColumnAction extends Action {
+export interface WhiteflagChangeColumnTypeAction extends Action {
   readonly type: string;
   readonly payload: {
+    readonly columnId: string;
     readonly columnType: WhiteflagColumnType;
     readonly query: object;
+    readonly unlinkPreviousColumn: boolean;
   };
 }
 
@@ -43,7 +45,7 @@ export interface WhiteflagStreamConnectionAction extends Action {
   readonly payload: {
     readonly whiteflag: Whiteflag;
     readonly columnId: string;
-    readonly streamType: MastodonStreamType;
+    readonly columnType: WhiteflagColumnType;
     readonly query: object;
     readonly state: string;
   };
@@ -90,15 +92,19 @@ export function updateCurrentDate(
   };
 }
 
-export function changeMainColumn(
+export function changeColumnType(
+  columnId: string,
   columnType: WhiteflagColumnType,
-  query: object = {}
-): WhiteflagChangeMainColumnAction {
+  query: object = {},
+  unlinkPreviousColumn: boolean = false
+): WhiteflagChangeColumnTypeAction {
   return {
-    type: 'WHITEFLAG_CHANGE_MAIN_COLUMN',
+    type: 'WHITEFLAG_CHANGE_COLUMN_TYPE',
     payload: {
+      columnId,
       columnType,
-      query
+      query,
+      unlinkPreviousColumn
     }
   };
 }
@@ -132,7 +138,7 @@ export function removeColumn(columnId: string): WhiteflagColumnAction {
 export function connectColumnToStream(
   whiteflag: Whiteflag,
   columnId: string,
-  streamType: MastodonStreamType,
+  columnType: WhiteflagColumnType,
   query: object = {}
 ): WhiteflagStreamConnectionAction {
   return {
@@ -140,7 +146,7 @@ export function connectColumnToStream(
     payload: {
       whiteflag,
       columnId,
-      streamType,
+      columnType,
       query,
       state: 'uninitialized'
     }

@@ -468,7 +468,6 @@ export class MastodonClient {
     if (toot.media_ids) {
       for (const mediaId of toot.media_ids) {
         data.append('media_ids[]', mediaId);
-        console.log('media_ids[]=', mediaId);
       }
     }
 

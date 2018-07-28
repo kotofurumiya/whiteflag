@@ -15,7 +15,7 @@ import { ChangeEvent } from 'react';
 interface ColumnProps {
   title: string;
   columnId: string;
-  columnType: string;
+  columnType: WhiteflagColumnType;
   query: object;
   tootList: MastodonTootStatus[];
   currentToot: MastodonTootPost;
@@ -23,6 +23,7 @@ interface ColumnProps {
   currentDate: Date;
   themeName: string;
   status: string;
+  previousColumn?: WhiteflagColumn;
 
   favourite: (tootId: string) => Promise<MastodonTootStatus>;
   unfavourite: (tootId: string) => Promise<MastodonTootStatus>;
@@ -31,12 +32,16 @@ interface ColumnProps {
   showMedia: (url: string, type: string) => any;
   addColumn: (type: WhiteflagColumnType, query: any) => any;
   removeColumn: (id: string) => any;
+  changeColumnType: (
+    columnId: string,
+    columnType: WhiteflagColumnType,
+    query?: object
+  ) => any;
   changeCurrentToot: (toot: MastodonTootPost) => void;
   changeCurrentAttachments: (attachments: MastodonAttachment[]) => void;
   postToot: (toot: MastodonTootPost) => Promise<MastodonTootStatus>;
   changeTheme: (themeName: string) => any;
   columnList?: WhiteflagColumn[];
-  onInit?: () => void;
 }
 
 export class Column extends React.Component<ColumnProps> {
@@ -54,14 +59,15 @@ export class Column extends React.Component<ColumnProps> {
   protected _removeColumnListener: (
     evt: React.MouseEvent<HTMLButtonElement>
   ) => void;
+  protected _changeColumnTypeListener: (
+    columnType: WhiteflagColumnType,
+    query?: object
+  ) => any;
+  protected _backPreviousColumnListener: () => any;
   protected _changeThemeListener: (evt: ChangeEvent<HTMLSelectElement>) => void;
 
   constructor(props: ColumnProps) {
     super(props);
-
-    if (this.props.onInit) {
-      this.props.onInit();
-    }
 
     this._columnMainRef = React.createRef();
     this._tootInputRef = React.createRef();
@@ -73,6 +79,8 @@ export class Column extends React.Component<ColumnProps> {
     this._scrollToTopListener = this._scrollToTop.bind(this);
     this._addColumnListener = this._addColumn.bind(this);
     this._removeColumnListener = this._removeColumn.bind(this);
+    this._changeColumnTypeListener = this._changeColumnType.bind(this);
+    this._backPreviousColumnListener = this._backPreviousColumn.bind(this);
     this._changeThemeListener = this._changeTheme.bind(this);
   }
 
@@ -111,6 +119,24 @@ export class Column extends React.Component<ColumnProps> {
     }
   }
 
+  protected _changeColumnType(
+    columnType: WhiteflagColumnType,
+    query?: object
+  ): void {
+    this.props.changeColumnType(this.props.columnId, columnType, query);
+  }
+
+  protected _backPreviousColumn(): void {
+    const prevColumn = this.props.previousColumn;
+    if (prevColumn) {
+      this.props.changeColumnType(
+        this.props.columnId,
+        prevColumn.columnType,
+        prevColumn.query
+      );
+    }
+  }
+
   protected _changeTheme(evt: ChangeEvent<HTMLSelectElement>) {
     this.props.changeTheme(evt.target.value);
   }
@@ -138,6 +164,7 @@ export class Column extends React.Component<ColumnProps> {
             favourite={this.props.favourite}
             unfavourite={this.props.unfavourite}
             showMedia={this.props.showMedia}
+            changeColumnType={this._changeColumnTypeListener}
           />
         </CSSTransition>
       );
@@ -259,9 +286,21 @@ export class Column extends React.Component<ColumnProps> {
       supportStreaming && isConnecting ? '接続を試みています……' : '';
     const statusType = status ? 'error' : 'ok';
 
+    const backButton = this.props.previousColumn ? (
+      <button
+        className="column-back-button"
+        onClick={this._backPreviousColumnListener}
+      >
+        &lt;
+      </button>
+    ) : (
+      undefined
+    );
+
     return (
       <div className="column">
         <header className="column-header" onClick={this._scrollToTopListener}>
+          {backButton}
           <h1 className="column-title">{this.props.title}</h1>
         </header>
         <div className="column-status-indicator" data-status-type={statusType}>
